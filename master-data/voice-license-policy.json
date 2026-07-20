@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "allow": [
+    "CC0-1.0",
+    "CC-BY-4.0",
+    "MIT",
+    "APACHE-2.0",
+    "PUBLIC-DOMAIN"
+  ],
+  "deny": [
+    "CC-BY-NC-4.0",
+    "CC-BY-ND-4.0",
+    "PROPRIETARY"
+  ],
+  "aliases": {
+    "PUBLIC DOMAIN": "PUBLIC-DOMAIN"
+  },
+  "unknownReason": "Voice license is missing or is not explicitly approved for redistribution.",
+  "restrictedReason": "Voice license is explicitly restricted by the redistribution policy."
+}

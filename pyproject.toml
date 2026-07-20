@@ -1,0 +1,52 @@
+[project]
+name = "talk-to-me-server"
+version = "0.1.0"
+description = "Local Piper text-to-speech server with a web portal"
+license = "GPL-3.0-only"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi>=0.116,<1",
+  "uvicorn[standard]>=0.35,<1",
+  "pydantic>=2.11,<3",
+  "piper-tts==1.4.2",
+  "numpy>=2,<3",
+  "sounddevice>=0.5,<1",
+  "httpx>=0.28,<1",
+  "python-multipart>=0.0.20,<1",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.4,<9",
+  "pytest-asyncio>=1,<2",
+  "pytest-playwright>=0.7,<1",
+  "axe-playwright-python>=0.1,<1",
+  "ruff>=0.12,<1",
+  "playwright>=1.54,<2",
+]
+
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/talk_to_me_server"]
+
+[tool.uv]
+link-mode = "copy"
+
+[tool.pytest.ini_options]
+testpaths = ["tests/unit", "tests/integration", "tests/smoke", "tests/e2e"]
+asyncio_mode = "auto"
+addopts = "--basetemp=.pytest-tmp"
+filterwarnings = [
+  "ignore:Using `httpx` with `starlette.testclient` is deprecated:starlette.exceptions.StarletteDeprecationWarning",
+]
+markers = [
+  "real_piper: requires an installed Piper model but no audio hardware",
+  "windows_audio: requires Windows, an output device, and TALK_TO_ME_AUDIO_SMOKE=1",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

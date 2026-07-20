@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "voices": [
+    {
+      "id": "en_US-ljspeech-medium",
+      "name": "ljspeech",
+      "language": "en_US",
+      "quality": "medium",
+      "sizeBytes": 63531379,
+      "license": "Public Domain",
+      "modelUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ljspeech/medium/en_US-ljspeech-medium.onnx",
+      "configUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ljspeech/medium/en_US-ljspeech-medium.onnx.json",
+      "modelSha256": "6f52a751e2349abe7a76735eb09dc1875298c77ea2342ffd2fef79ff81b87f22",
+      "configSha256": "141d612cc0a95ed7efc1ca936b845c2364967f2e9217c5dbfcf69fc4d6c65860"
+    }
+  ]
+}

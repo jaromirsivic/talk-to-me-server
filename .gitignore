@@ -1,0 +1,76 @@
+# Local worktrees and Codex state
+.worktrees/
+.superpowers/
+.local-safety-off
+.global-safety-off
+
+# Python environments and caches
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.pytest-debug/
+.pytest-debug2/
+.pytest-tmp/
+.ruff_cache/
+.mypy_cache/
+.pyright/
+.tox/
+.nox/
+
+# Test, coverage and profiling output
+test-results/
+playwright-report/
+coverage.xml
+.coverage
+.coverage.*
+htmlcov/
+*.prof
+
+# Build and packaging output
+build/
+dist/
+site/
+*.egg-info/
+*.egg
+
+# Application-generated data and downloaded runtimes
+.runtime/
+data/
+*.onnx
+*.onnx.data
+*.part
+
+# Logs, process state and temporary files
+*.log
+*.pid
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.local
+pm/
+
+# Editor and operating-system metadata
+.idea/
+.vscode/
+*.code-workspace
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# JavaScript package directories, if frontend tooling is used locally
+node_modules/
+
+# to remove
+master-data/sounds/
+docs/

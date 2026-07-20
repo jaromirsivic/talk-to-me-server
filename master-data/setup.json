@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "network": {
+    "ipv4Address": "127.0.0.1",
+    "ipv4Enabled": true,
+    "ipv6Address": "::1",
+    "ipv6Enabled": true,
+    "port": 44448,
+    "remoteManagementEnabled": true
+  },
+  "voice": {
+    "tts": "Piper",
+    "speaker": "en_US-ljspeech-medium",
+    "volume": 100
+  },
+  "general": {
+    "device": "CPU",
+    "workers": 4,
+    "directories": {
+      "tempDirectory": "./data/temp",
+      "speechDirectory": "./data/speech",
+      "textDirectory": "./data/text",
+      "garbageCollectorTimeout": 1000000000
+    },
+    "theme": "light"
+  },
+  "limits": {
+    "maxQueuedJobs": 100,
+    "maxRequestBodyBytes": 67108864
+  }
+}

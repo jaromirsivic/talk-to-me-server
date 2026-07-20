@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>TalkToMe Console</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#composer">Skip to request editor</a>
+    <header class="app-header">
+      <div class="brand" aria-label="TalkToMe Console">
+        <span class="brand-mark" aria-hidden="true">T</span>
+        <span><strong>TalkToMe</strong><small><span class="status-dot" aria-hidden="true"></span> Local console</small></span>
+      </div>
+      <nav class="setup-nav" aria-label="Server setup">
+        <button class="nav-button" type="button" data-voice-dialog aria-label="Voice Setup" data-i18n-aria-label="voice.title"><svg viewBox="0 0 24 24" aria-hidden="true" class="material-icon"><path d="M9 9c1.66 0 2.99-1.34 2.99-3S10.66 3 9 3 6 4.34 6 6s1.34 3 3 3zm0 2c-2 0-6 1-6 3v2h12v-2c0-2-4-3-6-3zm7.76-5.64-1.68 1.69c.84 1.18.84 2.71 0 3.89l1.68 1.69c2.02-2.02 2.02-5.07 0-7.27zM20.07 2l-1.63 1.63c2.77 3.02 2.77 7.56 0 10.74L20.07 16c3.9-3.89 3.91-9.95 0-14z"/></svg><span data-i18n="nav.voice">Voice</span></button>
+        <button class="nav-button" type="button" data-settings-dialog="network" aria-label="Network Setup" data-i18n-aria-label="network.title"><span class="network-setup-icon" aria-hidden="true"></span><span data-i18n="nav.network">Network</span></button>
+        <button class="nav-button" type="button" data-settings-dialog="general" aria-label="General Setup" data-i18n-aria-label="general.title"><span class="general-setup-icon" aria-hidden="true"></span><span data-i18n="nav.general">General</span></button>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-button" type="button" data-dialog="language-dialog" aria-label="Language" data-tooltip="Language" data-i18n-aria-label="nav.language" data-i18n-tooltip="nav.language">EN</button>
+        <button class="icon-button" id="theme-toggle" type="button" aria-label="Use dark theme" data-tooltip="Theme" disabled>☾</button>
+      </div>
+    </header>
+
+    <main class="console-main">
+      <section class="chat-column" aria-label="Text to speech conversation" data-i18n-aria-label="chat.region">
+        <div class="conversation-heading">
+          <p class="eyebrow" data-i18n="chat.eyebrow">TEXT TO SPEECH</p>
+          <span class="privacy-chip" data-i18n="chat.private">Runs on this device</span>
+        </div>
+        <div id="chat-history" class="chat-history" aria-live="polite" aria-relevant="additions">
+          <div class="welcome-card" id="welcome-card">
+            <span class="welcome-icon" aria-hidden="true">⌁</span>
+            <h2 data-i18n="chat.readyTitle">Ready when you are</h2>
+            <p data-i18n="chat.readyBody">Edit the JSON request below. Requests and responses stay visible only until this page is reloaded.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="composer-shell" id="composer" aria-label="Request composer">
+        <div class="composer-resize-handle" role="separator" aria-label="Resize request editor" aria-orientation="horizontal" aria-valuemin="200" aria-valuenow="230" tabindex="0"></div>
+        <div class="composer-toolbar">
+          <div><p class="eyebrow" id="composer-title" data-i18n="composer.request">REQUEST JSON</p><span class="endpoint">POST /api/v1/textToSpeech</span></div>
+          <div class="composer-toolbar-actions"><button type="button" class="quiet-button" id="reset-request" data-i18n="composer.reset">Reset</button><button type="button" class="quiet-button" id="benchmark-request" data-i18n="composer.benchmark">Benchmark</button><button type="button" class="quiet-button code-control" id="copy-request" data-code-action="copy" aria-label="Copy JSON" data-i18n-aria-label="code.copy" data-tooltip="Copy JSON" data-i18n-tooltip="code.copy"><span class="copy-icon" aria-hidden="true"></span></button><button type="button" class="quiet-button code-control" id="wrap-request" data-code-action="wrap" aria-label="Word wrap" data-i18n-aria-label="code.wordWrap" data-tooltip="Word wrap" data-i18n-tooltip="code.wordWrap" aria-pressed="true"><span class="wrap-icon" aria-hidden="true"></span></button><button type="button" class="quiet-button code-control" id="line-numbers-request" data-code-action="line-numbers" aria-label="Line numbers" data-i18n-aria-label="code.lineNumbers" data-tooltip="Line numbers" data-i18n-tooltip="code.lineNumbers" aria-pressed="false"><span class="line-numbers-icon" aria-hidden="true"></span></button><button type="button" class="quiet-button composer-size-toggle" id="composer-size-toggle" aria-label="Maximize request editor" data-i18n-aria-label="composer.maximize" data-tooltip="Maximize request editor" data-i18n-tooltip="composer.maximize" aria-pressed="false"><span class="fullscreen-icon" aria-hidden="true"></span></button></div>
+        </div>
+        <div class="code-view composer-editor"><div class="line-number-gutter" aria-hidden="true" hidden><div class="line-number-list"></div></div><label class="sr-only" for="request-json">Request JSON</label><textarea class="is-wrapped" id="request-json" aria-label="Request JSON" spellcheck="false" autocomplete="off" wrap="soft"></textarea></div>
+        <div class="composer-footer">
+          <span id="composer-status" aria-live="polite" data-i18n="composer.status">JSON is validated before sending</span>
+          <button class="send-button" id="send-request" type="button"><span data-i18n="composer.send">Send request</span></button>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="json-error-dialog" aria-labelledby="json-error-title">
+      <form method="dialog" class="dialog-card">
+        <div class="dialog-heading"><div><p class="eyebrow">CHECK REQUEST</p><h2 id="json-error-title" data-i18n="dialog.invalidJson">Invalid JSON</h2></div><button class="icon-button dialog-close" value="cancel" aria-label="Close" data-i18n-aria-label="dialog.close">×</button></div>
+        <p id="json-error-message"></p>
+        <div class="dialog-actions"><button class="primary-button" value="ok" data-i18n="dialog.return">Return to editor</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="voice-dialog" class="wide-dialog" aria-labelledby="voice-title">
+      <form class="dialog-card" id="voice-form" novalidate>
+        <div class="dialog-heading"><div><h2 id="voice-title" data-i18n="voice.title">Voice Setup</h2></div><button type="button" class="icon-button dialog-close" aria-label="Close" data-i18n-aria-label="dialog.close" data-setup-cancel>×</button></div>
+        <div class="voice-summary">
+          <div class="voice-current-summary"><p id="current-voice" class="current-voice">Current voice: loading…</p><p id="current-voice-language" class="current-voice">Language: loading…</p></div>
+          <div class="voice-volume-control"><label for="voice-volume"><span data-i18n="voice.volume">Volume</span> <output id="volume-output">100</output></label><input id="voice-volume" aria-label="Voice volume" data-i18n-aria-label="voice.volumeControl" type="range" min="0" max="100" value="100"></div>
+        </div>
+        <div class="voice-search-row">
+          <label class="search-field"><span data-i18n="voice.search">Search voices</span><input id="voice-search" role="combobox" aria-label="Search voices" data-i18n-aria-label="voice.search" aria-controls="voice-options" aria-expanded="true" autocomplete="off" placeholder="Name, language, or quality" data-i18n-placeholder="voice.searchPlaceholder"></label>
+          <fieldset class="voice-filter"><legend data-i18n="voice.filter">Filter</legend><button type="button" data-voice-filter="all" aria-pressed="true" data-i18n="voice.filter.all">All voices</button><button type="button" data-voice-filter="downloaded" aria-pressed="false" data-i18n="voice.filter.downloaded">Already downloaded</button></fieldset>
+        </div>
+        <div id="voice-options" class="voice-options" role="listbox" aria-label="Available voices"></div>
+        <details class="import-panel" id="import-panel">
+          <summary data-i18n="voice.import">Import a custom voice</summary>
+          <div class="form-grid import-fields">
+            <label><span data-i18n="voice.customName">Custom voice name</span><input id="custom-voice-name" type="text" required></label>
+            <label><span data-i18n="voice.license">Voice license</span><input id="custom-voice-license" type="text" required></label>
+            <label><span data-i18n="voice.modelFile">Piper model file</span><input id="custom-model-file" type="file" accept=".onnx"></label>
+            <label><span data-i18n="voice.configFile">Piper config file</span><input id="custom-config-file" type="file" accept=".json,.onnx.json"></label>
+            <label class="check-field span-all"><input id="custom-rights" type="checkbox"> <span data-i18n="voice.confirmRights">I confirm I have the right to use this voice</span></label>
+          </div>
+          <div class="import-actions"><button class="quiet-button" id="import-local-voice" type="button" data-i18n="voice.importLocal">Import local voice</button></div>
+        </details>
+        <p class="save-status" data-save-status aria-live="polite"></p>
+        <div class="dialog-actions voice-dialog-actions"><button type="button" class="quiet-button" data-setup-cancel data-i18n="dialog.cancel">Cancel</button><button class="primary-button" data-i18n="dialog.save" type="submit">Save settings</button></div>
+      </form>
+    </dialog>
+    <dialog id="download-voice-dialog" aria-labelledby="download-voice-title">
+      <div class="dialog-card"><div class="dialog-heading"><div><h2 id="download-voice-title" data-i18n="voice.download">Download voice</h2></div><button class="icon-button dialog-close" aria-label="Close" data-i18n-aria-label="dialog.close">×</button></div><p id="download-voice-message"></p><div class="download-progress" id="download-voice-progress" role="status" aria-live="polite" hidden><strong data-i18n="voice.downloading">Downloading voice…</strong><span data-i18n="voice.downloadingHint">The download is in progress. This may take a few minutes.</span><progress aria-label="Voice download progress" data-i18n-aria-label="voice.downloadProgress"></progress></div><div class="dialog-actions"><button type="button" class="quiet-button dialog-close" data-i18n="dialog.cancel">Cancel</button><button type="button" class="primary-button" id="confirm-download-voice" data-i18n="voice.downloadAndUse">Download and use</button></div></div>
+    </dialog>
+    <dialog id="delete-voice-dialog" aria-labelledby="delete-voice-title">
+      <div class="dialog-card"><div class="dialog-heading"><div><h2 id="delete-voice-title" data-i18n="voice.delete">Delete Voice</h2></div><button class="icon-button dialog-close" aria-label="Close" data-i18n-aria-label="dialog.close">×</button></div><p id="delete-voice-message"></p><div class="dialog-actions"><button type="button" class="quiet-button dialog-close" data-i18n="dialog.cancel">Cancel</button><button type="button" class="primary-button" id="confirm-delete-voice" data-i18n="voice.deleteAction">Delete voice</button></div></div>
+    </dialog>
+    <dialog id="network-dialog" aria-labelledby="network-title">
+      <form class="dialog-card settings-form" id="network-form">
+        <div class="dialog-heading"><div><h2 id="network-title" data-i18n="network.title">Network Setup</h2></div><button type="button" class="icon-button dialog-close" aria-label="Close" data-i18n-aria-label="dialog.close" data-setup-cancel>×</button></div>
+        <div class="form-grid">
+          <label class="check-field"><input id="ipv4-enabled" type="checkbox"> Enable IPv4</label>
+          <label>IPv4 address<input id="ipv4-address" type="text" required></label>
+          <label class="check-field"><input id="ipv6-enabled" type="checkbox"> Enable IPv6</label>
+          <label>IPv6 address<input id="ipv6-address" type="text" required></label>
+          <label>Port<input id="network-port" type="number" min="1" max="65535" required></label>
+          <label class="check-field span-all"><input id="remote-management" type="checkbox"> <span data-i18n="network.remoteManagement">Enable remote management</span></label>
+          <div class="warning-panel" id="remote-management-warning" hidden data-i18n="network.remoteWarning">Remote management exposes setup controls to your LAN.</div>
+        </div>
+        <p class="save-status" data-save-status aria-live="polite"></p>
+        <div class="dialog-actions"><button type="button" class="quiet-button dialog-close" data-setup-cancel data-i18n="dialog.cancel">Cancel</button><button class="primary-button" data-i18n="dialog.save" type="submit">Save settings</button></div>
+      </form>
+    </dialog>
+    <dialog id="general-dialog" aria-labelledby="general-title">
+      <form class="dialog-card settings-form" id="general-form">
+        <div class="dialog-heading"><div><h2 id="general-title" data-i18n="general.title">General Setup</h2></div><button type="button" class="icon-button dialog-close" aria-label="Close" data-i18n-aria-label="dialog.close" data-setup-cancel>×</button></div>
+        <div class="form-grid">
+          <label>Compute device<select id="compute-device"><option value="CPU">CPU</option><option value="GPU" disabled>GPU (not available)</option></select></label>
+          <label>Synthesis workers<input id="synthesis-workers" type="number" min="1" max="16" required></label>
+          <label class="span-all technical-field">Temporary directory<input id="temp-directory" type="text" required></label>
+          <label class="span-all technical-field">Speech directory<input id="speech-directory" type="text" required></label>
+          <label class="span-all technical-field">Text directory<input id="text-directory" type="text" required></label>
+          <label class="span-all">Garbage collector timeout<input id="gc-timeout" type="number" min="0" required></label>
+        </div>
+        <p class="save-status" data-save-status aria-live="polite"></p>
+        <div class="dialog-actions"><button type="button" class="quiet-button dialog-close" data-setup-cancel data-i18n="dialog.cancel">Cancel</button><button class="primary-button" data-i18n="dialog.save" type="submit">Save settings</button></div>
+      </form>
+    </dialog>
+    <dialog id="language-dialog" aria-labelledby="language-title">
+      <div class="dialog-card">
+        <div class="dialog-heading"><h2 id="language-title" data-i18n="nav.language">Language</h2><button class="icon-button dialog-close" aria-label="Close" data-i18n-aria-label="dialog.close">×</button></div>
+        <label class="search-field"><span data-i18n="language.search">Search languages</span><input id="language-search" role="combobox" aria-label="Search languages" data-i18n-aria-label="language.search" aria-controls="language-options" aria-expanded="true" autocomplete="off" placeholder="Search languages" data-i18n-placeholder="language.search"></label>
+        <div id="language-options" class="language-options" role="listbox" aria-label="Languages"></div>
+      </div>
+    </dialog>
+
+    <div class="toast" id="portal-toast" role="status" aria-live="polite" popover="manual" hidden>
+      <span class="toast-message" data-toast-message></span>
+      <button type="button" class="toast-close" aria-label="Close" data-i18n-aria-label="dialog.close" data-toast-close>×</button>
+    </div>
+
+    <template id="chat-card-template">
+      <article class="chat-card"><div class="card-meta"><div class="card-heading"><span class="card-kind"></span><time class="card-time"></time></div><div class="card-code-controls"><button type="button" class="code-control" data-code-action="copy" aria-label="Copy JSON" data-i18n-aria-label="code.copy" data-tooltip="Copy JSON" data-i18n-tooltip="code.copy"><span class="copy-icon" aria-hidden="true"></span></button><button type="button" class="code-control" data-code-action="wrap" aria-label="Word wrap" data-i18n-aria-label="code.wordWrap" data-tooltip="Word wrap" data-i18n-tooltip="code.wordWrap" aria-pressed="true"><span class="wrap-icon" aria-hidden="true"></span></button><button type="button" class="code-control" data-code-action="line-numbers" aria-label="Line numbers" data-i18n-aria-label="code.lineNumbers" data-tooltip="Line numbers" data-i18n-tooltip="code.lineNumbers" aria-pressed="false"><span class="line-numbers-icon" aria-hidden="true"></span></button></div></div><div class="code-view card-code-view"><div class="line-number-gutter" aria-hidden="true" hidden><div class="line-number-list"></div></div><pre class="json-block is-wrapped"><code></code></pre></div></article>
+    </template>
+    <script type="module" src="/js/app.js"></script>
+  </body>
+</html>

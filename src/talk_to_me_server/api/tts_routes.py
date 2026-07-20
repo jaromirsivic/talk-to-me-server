@@ -1,0 +1,69 @@
+from __future__ import annotations
+
+from fastapi import APIRouter, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from pydantic import ValidationError
+from starlette.background import BackgroundTask
+
+from talk_to_me_server.api.envelopes import envelope
+from talk_to_me_server.api.schemas import TextToSpeechRequest
+from talk_to_me_server.domain.stats import calculate_stats
+
+
+router = APIRouter(prefix="/api/v1")
+
+
+@router.post("/textToSpeech")
+async def text_to_speech(
+    request: Request, payload: TextToSpeechRequest
+) -> JSONResponse:
+    runtime = request.app.state.runtime
+    snapshot = None
+    if payload.value is not None:
+        if runtime.text_segmenter is None:
+            return envelope(503, "Text segmentation is unavailable")
+        snapshot = runtime.live_snapshot()
+        try:
+            values = await runtime.text_segmenter.split(
+                payload.value, snapshot.speaker
+            )
+            payload = payload.with_values(values)
+        except ValidationError as error:
+            raise RequestValidationError(error.errors()) from error
+        except (OSError, ValueError, KeyError):
+            return envelope(503, "Text segmentation is unavailable")
+    if payload.values is None or payload.values == []:
+        return envelope(200, "No values to process")
+    if runtime.queue is None or runtime.archive is None:
+        return envelope(503, "Text-to-speech runtime is unavailable")
+    admission = await runtime.queue.enqueue(
+        payload, snapshot or runtime.live_snapshot()
+    )
+    if not admission.accepted or admission.job is None:
+        return envelope(admission.status, admission.reason)
+    job = admission.job
+    try:
+        runtime.archive.create(job)
+    except OSError:
+        await runtime.queue.fail(
+            job.id,
+            runtime.job_error(507, "Archive is not writable", "archive"),
+        )
+        await runtime.queue.release(job.id)
+        return envelope(507, "Archive is not writable")
+    if not (payload.calculate_stats or payload.wait_until_playback_finished):
+        return envelope(200, "Accepted", jobId=job.id)
+    terminal = await runtime.queue.wait_terminal(job.id)
+    status = terminal.errors[0].code if terminal.errors else 200
+    reason = terminal.errors[0].message if terminal.errors else "OK"
+    response = envelope(status, reason, job=terminal.to_dict())
+    if payload.calculate_stats:
+        response = envelope(
+            status,
+            reason,
+            job=terminal.to_dict(include_worker_details=True),
+            stats=calculate_stats(terminal),
+        )
+    response.background = BackgroundTask(runtime.queue.release, job.id)
+    return response

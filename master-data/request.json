@@ -1,0 +1,8 @@
+{
+  "values": [
+    "Hello from TalkToMe Server."
+  ],
+  "importance": "high",
+  "calculateStats": false,
+  "waitUntilPlaybackFinished": false
+}

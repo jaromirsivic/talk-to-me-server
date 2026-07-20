@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "uv": {
+    "version": "0.11.29",
+    "url": "https://releases.astral.sh/github/uv/releases/download/0.11.29/uv-x86_64-pc-windows-msvc.zip",
+    "sha256": "a047d55651bc3e0ca24595b25ec4cfcb10f9dca9fb56514e661269b37d4fae68"
+  },
+  "officialCatalog": {
+    "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/voices.json",
+    "baseUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/main/"
+  },
+  "defaultVoice": {
+    "id": "en_US-ljspeech-medium",
+    "license": "Public Domain",
+    "modelPath": "en/en_US/ljspeech/medium/en_US-ljspeech-medium.onnx",
+    "configPath": "en/en_US/ljspeech/medium/en_US-ljspeech-medium.onnx.json",
+    "modelSha256": "6f52a751e2349abe7a76735eb09dc1875298c77ea2342ffd2fef79ff81b87f22",
+    "configSha256": "141d612cc0a95ed7efc1ca936b845c2364967f2e9217c5dbfcf69fc4d6c65860"
+  }
+}
