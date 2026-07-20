@@ -104,3 +104,33 @@ def test_initialize_removes_legacy_voice_severity_from_existing_setup(
     persisted = json.loads(path.read_text(encoding="utf-8"))
     assert "severity" not in persisted["voice"]
     assert service.current().voice == approved_settings.voice
+
+
+def test_initialize_adds_derived_language_to_existing_setup(
+    tmp_path, approved_settings
+) -> None:
+    path = tmp_path / "setup.json"
+    existing = approved_settings.model_dump(mode="json", by_alias=True)
+    del existing["voice"]["language"]
+    path.write_text(json.dumps(existing), encoding="utf-8")
+
+    service = SettingsService(path, approved_settings)
+    service.initialize()
+
+    persisted = json.loads(path.read_text(encoding="utf-8"))
+    assert persisted["voice"]["language"] == "en_US"
+
+
+def test_save_rederives_language_from_speaker(tmp_path, approved_settings) -> None:
+    path = tmp_path / "setup.json"
+    service = SettingsService(path, approved_settings)
+    service.initialize()
+    candidate = approved_settings.model_copy(deep=True)
+    object.__setattr__(candidate.voice, "speaker", "cs_CZ-jirka-medium")
+    object.__setattr__(candidate.voice, "language", "de_DE")
+
+    result = service.save(candidate)
+
+    persisted = json.loads(path.read_text(encoding="utf-8"))
+    assert result.settings.voice.language == "cs_CZ"
+    assert persisted["voice"]["language"] == "cs_CZ"

@@ -172,9 +172,10 @@ dialog::backdrop { background: rgb(12 17 29 / 54%); backdrop-filter: blur(4px); 
 .voice-filter button { min-height: 36px; padding: 0 10px; border: 0; border-radius: 8px; color: var(--muted); background: transparent; cursor: pointer; font-size: 11px; font-weight: 750; }
 .voice-filter button[aria-pressed="true"] { color: var(--text); background: var(--surface); box-shadow: 0 1px 4px rgb(25 39 74 / 12%); }
 .voice-options { display: grid; gap: 8px; max-height: 248px; margin-top: 10px; overflow-y: auto; }
-.voice-option { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; width: 100%; min-height: 58px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 12px; color: var(--text); background: var(--surface); cursor: pointer; text-align: left; }
-.voice-option:hover:not(:disabled), .voice-option[aria-selected="true"] { border-color: var(--blue); background: var(--blue-soft); }
-.voice-option:disabled { cursor: not-allowed; opacity: .62; }
+.voice-option-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.voice-option-row:has(.voice-option:not(:disabled)):hover, .voice-option-row:has(.voice-option[aria-pressed="true"]) { border-color: var(--blue); background: var(--blue-soft); }
+.voice-option { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; width: 100%; min-width: 0; min-height: 58px; padding: 9px 11px; border: 0; border-radius: 12px; color: var(--text); background: transparent; cursor: pointer; text-align: left; }
+.voice-option[aria-disabled="true"] { cursor: not-allowed; opacity: .62; }
 .voice-option strong, .voice-option small { display: block; }
 .voice-option small { margin-top: 3px; color: var(--muted); }
 .source-badge { display: inline-block; width: max-content; margin-top: 5px; padding: 2px 6px; border-radius: 999px; color: var(--blue); background: var(--blue-soft); font-size: 10px; font-weight: 800; text-transform: uppercase; }
@@ -184,6 +185,8 @@ dialog::backdrop { background: rgb(12 17 29 / 54%); backdrop-filter: blur(4px); 
 .voice-status-details { display: grid; gap: 3px; justify-items: end; }
 .voice-status-label { color: var(--muted); font-size: 11px; font-weight: 750; }
 .voice-size { color: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.voice-delete-button { min-height: 30px; margin: 9px 11px 9px 0; padding: 3px 9px; border: 1px solid #b42318; border-radius: 8px; color: #b42318; background: transparent; cursor: pointer; font-size: 11px; font-weight: 750; }
+.voice-delete-button:hover { color: #fff; background: #b42318; }
 .voice-empty { margin: 0; padding: 22px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); text-align: center; font-size: 13px; }
 .import-panel { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 14px; }
 .import-panel summary { cursor: pointer; color: var(--blue); font-size: 13px; font-weight: 800; }
@@ -230,6 +233,7 @@ dialog::backdrop { background: rgb(12 17 29 / 54%); backdrop-filter: blur(4px); 
   .voice-summary, .voice-search-row { grid-template-columns: 1fr; }
   .voice-filter { width: 100%; min-width: 0; }
   .voice-filter button { flex: 1; }
+  .voice-option-row { grid-template-columns: minmax(0, 1fr) auto; }
   .voice-option { grid-template-columns: 32px 1fr; }
   .voice-status-details { grid-column: 2; justify-items: start; }
   .voice-dialog-actions { position: sticky; bottom: -24px; margin-right: -24px; margin-left: -24px; padding: 14px 24px 24px; border-top: 1px solid var(--line); background: var(--surface); }

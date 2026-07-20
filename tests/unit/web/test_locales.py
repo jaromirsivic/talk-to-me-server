@@ -23,6 +23,7 @@ def test_all_locale_files_have_exactly_the_english_keys() -> None:
         "voice.filter.downloaded", "voice.filter", "voice.noResults",
         "voice.unknown", "voice.unavailable", "voice.volumeControl",
         "voice.download", "voice.confirmLicense",
+        "voice.select", "voice.selectMessage", "voice.selectAction",
         "voice.import", "voice.license", "voice.downloadAndUse",
         "voice.files", "voice.downloading", "voice.downloadingHint",
         "voice.downloadProgress", "voice.loadError", "voice.downloadError",

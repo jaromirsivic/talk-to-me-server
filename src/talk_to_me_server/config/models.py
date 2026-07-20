@@ -48,7 +48,13 @@ class NetworkSettings(StrictModel):
 class VoiceSettings(StrictModel):
     tts: Literal["Piper"] = "Piper"
     speaker: str = "en_US-ljspeech-medium"
+    language: str = "en_US"
     volume: int = Field(default=100, ge=0, le=100)
+
+    @model_validator(mode="after")
+    def derive_language_from_speaker(self) -> VoiceSettings:
+        object.__setattr__(self, "language", self.speaker.split("-", 1)[0])
+        return self
 
 
 class DirectorySettings(StrictModel):

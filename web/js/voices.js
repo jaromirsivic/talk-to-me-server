@@ -11,6 +11,7 @@ const STATUS_ICON_PATHS = {
 
 let voices = [];
 let downloadCandidate = null;
+let selectCandidate = null;
 let deleteCandidate = null;
 let activeOption = -1;
 let filterMode = "all";
@@ -35,6 +36,7 @@ export function initializeVoices() {
   document.querySelector("#voice-search").addEventListener("input", renderVoices);
   document.querySelector("#voice-search").addEventListener("keydown", handleSearchKeys);
   document.querySelector("#confirm-download-voice").addEventListener("click", downloadVoice);
+  document.querySelector("#confirm-select-voice").addEventListener("click", selectVoice);
   document.querySelector("#confirm-delete-voice").addEventListener("click", deleteVoice);
   document.querySelector("#import-local-voice").addEventListener("click", importLocalVoice);
   document.querySelector("#voice-volume").addEventListener("input", (event) => {
@@ -80,10 +82,13 @@ async function refreshVoices() {
 
 function visibleVoices() {
   const query = document.querySelector("#voice-search").value.trim().toLowerCase();
-  return voices.filter((voice) => {
+  const matches = voices.filter((voice) => {
     const passesFilter = filterMode === "all" || voice.status === "ready";
     return passesFilter && searchable(voice).includes(query);
   });
+  return matches.sort(
+    (left, right) => Number(right.status === "ready") - Number(left.status === "ready"),
+  );
 }
 
 function renderVoices() {
@@ -92,7 +97,6 @@ function renderVoices() {
   const selectedId = controller?.getDraft()?.speaker;
   const focusedVoiceId = document.activeElement?.closest?.("[data-voice-id]")?.dataset.voiceId;
   list.replaceChildren();
-  search.removeAttribute("aria-activedescendant");
   activeOption = -1;
   const visible = visibleVoices();
   if (!visible.length) {
@@ -103,22 +107,26 @@ function renderVoices() {
     return;
   }
   for (const voice of visible) {
+    const row = document.createElement("div");
     const option = document.createElement("button");
     const status = statusText(voice);
     const installedSize = voice.status === "ready" && voice.sizeBytes
       ? formatSize(voice.sizeBytes)
       : null;
+    row.className = "voice-option-row";
+    row.role = "listitem";
+    row.dataset.voiceRowId = voice.id;
     option.type = "button";
-    option.role = "option";
     option.id = `voice-option-${safeId(voice.id)}`;
     option.className = "voice-option";
     option.dataset.voiceId = voice.id;
     const actionable = voice.status === "ready" || voice.status === "downloadRequired";
+    option.tabIndex = actionable ? 0 : -1;
     if (!actionable) {
       option.disabled = true;
       option.setAttribute("aria-disabled", "true");
     }
-    option.setAttribute("aria-selected", String(voice.id === selectedId));
+    option.setAttribute("aria-pressed", String(voice.id === selectedId));
     option.setAttribute(
       "aria-label",
       `${voice.name}, ${voice.language}, ${voice.quality}, ${status}${installedSize ? `, ${installedSize}` : ""}${voice.blockedReason ? `, ${voice.blockedReason}` : ""}`,
@@ -146,21 +154,34 @@ function renderVoices() {
       content.append(source);
     }
 
-    const statusLabel = document.createElement("span");
-    statusLabel.className = "voice-status-label";
-    statusLabel.textContent = status;
-    const statusDetails = document.createElement("span");
-    statusDetails.className = "voice-status-details";
-    statusDetails.append(statusLabel);
-    if (installedSize) {
-      const size = document.createElement("span");
-      size.className = "voice-size";
-      size.textContent = installedSize;
-      statusDetails.append(size);
+    option.append(icon, content);
+    if (voice.status !== "ready") {
+      const statusLabel = document.createElement("span");
+      statusLabel.className = "voice-status-label";
+      statusLabel.textContent = status;
+      const statusDetails = document.createElement("span");
+      statusDetails.className = "voice-status-details";
+      statusDetails.append(statusLabel);
+      option.append(statusDetails);
     }
-    option.append(icon, content, statusDetails);
-    if (actionable) option.addEventListener("click", () => chooseVoice(voice));
-    list.append(option);
+    row.append(option);
+    if (voice.status === "ready") {
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.className = "voice-delete-button";
+      const deleteLabel = translate("voice.deleteAction");
+      deleteButton.textContent = installedSize
+        ? `${deleteLabel} (${installedSize})`
+        : deleteLabel;
+      deleteButton.addEventListener("click", () => {
+        requestVoiceDeletion(voice);
+      });
+      row.append(deleteButton);
+    }
+    if (actionable) {
+      option.addEventListener("click", () => chooseVoice(voice));
+    }
+    list.append(row);
   }
   if (focusedVoiceId) focusVoiceOption(focusedVoiceId);
 }
@@ -234,11 +255,27 @@ function chooseVoice(voice) {
     return;
   }
   if (voice.status === "ready") {
-    deleteCandidate = voice;
-    document.querySelector("#delete-voice-message").textContent =
-      translate("voice.deleteMessage", {name: voice.name});
-    openDialog(document.querySelector("#delete-voice-dialog"), "#confirm-delete-voice");
+    selectCandidate = voice;
+    document.querySelector("#select-voice-message").textContent =
+      translate("voice.selectMessage", {name: voice.name});
+    openDialog(document.querySelector("#select-voice-dialog"), "#confirm-select-voice");
   }
+}
+
+function selectVoice() {
+  const candidate = selectCandidate;
+  if (!candidate) return;
+  document.querySelector("#select-voice-dialog").close();
+  selectCandidate = null;
+  stageVoice(candidate.id);
+  queueMicrotask(() => focusVoiceOption(candidate.id));
+}
+
+function requestVoiceDeletion(voice) {
+  deleteCandidate = voice;
+  document.querySelector("#delete-voice-message").textContent =
+    translate("voice.deleteMessage", {name: voice.name});
+  openDialog(document.querySelector("#delete-voice-dialog"), "#confirm-delete-voice");
 }
 
 async function downloadVoice() {
@@ -368,7 +405,7 @@ function focusVoiceOption(voiceId) {
 }
 
 function handleSearchKeys(event) {
-  const options = [...document.querySelectorAll("#voice-options [role=option]")];
+  const options = [...document.querySelectorAll("#voice-options .voice-option")];
   if (!options.length) return;
   if (event.key === "ArrowDown") activeOption = Math.min(activeOption + 1, options.length - 1);
   else if (event.key === "ArrowUp") activeOption = Math.max(activeOption - 1, 0);
@@ -380,7 +417,7 @@ function handleSearchKeys(event) {
   } else return;
   event.preventDefault();
   if (activeOption >= 0) {
-    event.currentTarget.setAttribute("aria-activedescendant", options[activeOption].id);
     options[activeOption].scrollIntoView({block: "nearest"});
+    options[activeOption].focus();
   }
 }

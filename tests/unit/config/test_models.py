@@ -16,10 +16,22 @@ def test_master_setup_is_valid_and_has_approved_defaults() -> None:
     assert settings.network.port == 44448
     assert settings.network.remote_management_enabled is True
     assert settings.voice.speaker == "en_US-ljspeech-medium"
+    assert settings.voice.language == "en_US"
     assert settings.general.workers == 4
     assert settings.limits.max_request_body_bytes == 67_108_864
     assert "severity" not in settings.voice.model_dump(mode="json")
     assert '"severity"' not in raw
+
+
+def test_voice_language_is_always_derived_from_speaker() -> None:
+    setup = Settings.model_validate_json(MASTER.read_text(encoding="utf-8"))
+    raw = setup.model_dump(mode="json", by_alias=True)
+    raw["voice"]["speaker"] = "cs_CZ-jirka-medium"
+    raw["voice"]["language"] = "de_DE"
+
+    validated = Settings.model_validate(raw)
+
+    assert validated.voice.language == "cs_CZ"
 
 
 def test_legacy_names_and_unknown_fields_are_rejected() -> None:

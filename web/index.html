@@ -70,10 +70,10 @@
           <div class="voice-volume-control"><label for="voice-volume"><span data-i18n="voice.volume">Volume</span> <output id="volume-output">100</output></label><input id="voice-volume" aria-label="Voice volume" data-i18n-aria-label="voice.volumeControl" type="range" min="0" max="100" value="100"></div>
         </div>
         <div class="voice-search-row">
-          <label class="search-field"><span data-i18n="voice.search">Search voices</span><input id="voice-search" role="combobox" aria-label="Search voices" data-i18n-aria-label="voice.search" aria-controls="voice-options" aria-expanded="true" autocomplete="off" placeholder="Name, language, or quality" data-i18n-placeholder="voice.searchPlaceholder"></label>
+          <label class="search-field"><span data-i18n="voice.search">Search voices</span><input id="voice-search" type="search" aria-label="Search voices" data-i18n-aria-label="voice.search" aria-controls="voice-options" autocomplete="off" placeholder="Name, language, or quality" data-i18n-placeholder="voice.searchPlaceholder"></label>
           <fieldset class="voice-filter"><legend data-i18n="voice.filter">Filter</legend><button type="button" data-voice-filter="all" aria-pressed="true" data-i18n="voice.filter.all">All voices</button><button type="button" data-voice-filter="downloaded" aria-pressed="false" data-i18n="voice.filter.downloaded">Already downloaded</button></fieldset>
         </div>
-        <div id="voice-options" class="voice-options" role="listbox" aria-label="Available voices"></div>
+        <div id="voice-options" class="voice-options" role="list" aria-label="Available voices"></div>
         <details class="import-panel" id="import-panel">
           <summary data-i18n="voice.import">Import a custom voice</summary>
           <div class="form-grid import-fields">
@@ -91,6 +91,9 @@
     </dialog>
     <dialog id="download-voice-dialog" aria-labelledby="download-voice-title">
       <div class="dialog-card"><div class="dialog-heading"><div><h2 id="download-voice-title" data-i18n="voice.download">Download voice</h2></div><button class="icon-button dialog-close" aria-label="Close" data-i18n-aria-label="dialog.close">×</button></div><p id="download-voice-message"></p><div class="download-progress" id="download-voice-progress" role="status" aria-live="polite" hidden><strong data-i18n="voice.downloading">Downloading voice…</strong><span data-i18n="voice.downloadingHint">The download is in progress. This may take a few minutes.</span><progress aria-label="Voice download progress" data-i18n-aria-label="voice.downloadProgress"></progress></div><div class="dialog-actions"><button type="button" class="quiet-button dialog-close" data-i18n="dialog.cancel">Cancel</button><button type="button" class="primary-button" id="confirm-download-voice" data-i18n="voice.downloadAndUse">Download and use</button></div></div>
+    </dialog>
+    <dialog id="select-voice-dialog" aria-labelledby="select-voice-title">
+      <div class="dialog-card"><div class="dialog-heading"><div><h2 id="select-voice-title" data-i18n="voice.select">Select Voice</h2></div><button class="icon-button dialog-close" aria-label="Close" data-i18n-aria-label="dialog.close">×</button></div><p id="select-voice-message"></p><div class="dialog-actions"><button type="button" class="quiet-button dialog-close" data-i18n="dialog.cancel">Cancel</button><button type="button" class="primary-button" id="confirm-select-voice" data-i18n="voice.selectAction">Use voice</button></div></div>
     </dialog>
     <dialog id="delete-voice-dialog" aria-labelledby="delete-voice-title">
       <div class="dialog-card"><div class="dialog-heading"><div><h2 id="delete-voice-title" data-i18n="voice.delete">Delete Voice</h2></div><button class="icon-button dialog-close" aria-label="Close" data-i18n-aria-label="dialog.close">×</button></div><p id="delete-voice-message"></p><div class="dialog-actions"><button type="button" class="quiet-button dialog-close" data-i18n="dialog.cancel">Cancel</button><button type="button" class="primary-button" id="confirm-delete-voice" data-i18n="voice.deleteAction">Delete voice</button></div></div>

@@ -175,6 +175,28 @@ def test_installed_voice_uses_delete_confirmation_flow() -> None:
     assert 'postApi("deleteVoice"' in voices
     assert 'translate("voice.deleteMessage"' in voices
     assert 'translate("voice.deleted")' in voices
+    assert 'className = "voice-delete-button"' in voices
+    assert "voice.status !== \"ready\"" in voices
+    assert "`${deleteLabel} (${installedSize})`" in voices
+    assert 'className = "voice-option-row"' in voices
+    assert 'requestVoiceDeletion(voice)' in voices
+
+
+def test_installed_voice_row_uses_selection_confirmation_flow() -> None:
+    html = Path("web/index.html").read_text(encoding="utf-8")
+    voices = Path("web/js/voices.js").read_text(encoding="utf-8")
+
+    assert 'id="select-voice-dialog"' in html
+    assert 'id="select-voice-message"' in html
+    assert 'id="confirm-select-voice"' in html
+    assert 'translate("voice.selectMessage"' in voices
+    assert "stageVoice(candidate.id)" in voices
+
+
+def test_installed_voices_are_sorted_before_catalog_downloads() -> None:
+    voices = Path("web/js/voices.js").read_text(encoding="utf-8")
+
+    assert 'Number(right.status === "ready") - Number(left.status === "ready")' in voices
 
 
 def test_voice_setup_has_summary_filter_and_local_only_collapsed_import() -> None:

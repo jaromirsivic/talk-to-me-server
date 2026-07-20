@@ -27,3 +27,18 @@
 - Unixové řídicí skripty bezpečně sledují PID, ověřují vlastnictví procesu, kontrolují port a zapisují provozní výstup do logů.
 - Dokumentace a smoke testy byly aktualizovány pro nové názvy a podporované platformy.
 - Shellové skripty mají v Gitu vynucené LF konce řádků.
+
+## Jazyk hlasu v konfiguraci
+
+- Do konfigurace `voice` byl přidán parametr `language`, který se automaticky odvozuje z prefixu `speaker`.
+- Načtení starší konfigurace odvozený jazyk doplní a zpracování `setSetup` jej před uložením znovu korektně nastaví.
+- `getSetup` vrací odvozený jazyk v odpovědi a výchozí `setup.json` obsahuje odpovídající hodnotu.
+- Byly doplněny jednotkové a integrační testy odvození, migrace a REST API.
+
+## Výběr a mazání nainstalovaných hlasů
+
+- Kliknutí na řádek nainstalovaného hlasu otevře potvrzení jeho výběru a potvrzená změna se odešle přes `setSetup` až po uložení nastavení.
+- Mazání se spouští samostatným červeně obtaženým tlačítkem ve formátu `Smazat (velikost)`.
+- Nainstalované hlasy se řadí před hlasy dostupné ke stažení, takže tlačítka pro smazání jsou viditelná ihned po otevření dialogu.
+- Dialog výběru hlasu a nové ovládací prvky jsou přeložené do všech podporovaných jazyků a respektují pravidla přístupnosti.
+- Byly doplněny kontraktní, lokalizační, E2E a mobilní testy.

@@ -53,7 +53,7 @@ def test_visible_setup_and_download_dialogs_are_accessible_without_mobile_overfl
 
     page.get_by_role("button", name="Voice Setup").click()
     _assert_accessible_without_horizontal_overflow(page)
-    page.get_by_role("option", name=re.compile("locked voice", re.I)).click()
+    page.get_by_role("button", name=re.compile("locked voice", re.I)).click()
     expect(page.get_by_role("dialog", name="Confirm voice license")).to_be_visible()
     _assert_accessible_without_horizontal_overflow(page)
     page.get_by_role("dialog", name="Confirm voice license").locator(
@@ -93,7 +93,7 @@ def test_locale_change_updates_cr001_controls_and_status_icons_are_hidden(
 
     voice_trigger = page.locator("[data-voice-dialog]")
     expect(voice_trigger).to_have_text("Stimme")
-    expect(voice_trigger).to_have_attribute("aria-label", "Voice Setup")
+    expect(voice_trigger).to_have_attribute("aria-label", "Stimmeinstellungen")
     voice_trigger.click()
     page.locator("#voice-options").wait_for()
     assert page.locator("#voice-options .voice-status svg").evaluate_all(
@@ -109,12 +109,13 @@ def test_non_english_voice_unknown_and_failure_fallbacks_are_localized(
     page.get_by_role("combobox", name="Search languages").fill("Deutsch")
     page.get_by_role("option", name="Deutsch").click()
 
-    page.get_by_role("button", name="Voice Setup").click()
-    page.get_by_role("option", name=re.compile("locked voice", re.I)).click()
-    expect(page.get_by_role("dialog", name="Confirm voice license")).to_contain_text(
-        "Unbekannt"
+    page.get_by_role("button", name="Stimmeinstellungen").click()
+    page.get_by_role("button", name=re.compile("locked voice", re.I)).click()
+    license_dialog = page.get_by_role(
+        "dialog", name="Bestätigen Sie die Sprachlizenz"
     )
-    page.get_by_role("dialog", name="Confirm voice license").locator(
+    expect(license_dialog).to_contain_text("Unbekannt")
+    license_dialog.locator(
         ".icon-button.dialog-close"
     ).click()
     page.locator("#voice-dialog [data-setup-cancel]").first.click()
@@ -123,5 +124,5 @@ def test_non_english_voice_unknown_and_failure_fallbacks_are_localized(
         "**/api/v1/getVoices",
         lambda route: route.fulfill(status=502, json={"reasonCode": 502}),
     )
-    page.get_by_role("button", name="Voice Setup").click()
-    expect(page.get_by_text("Stimmen konnten nicht geladen werden")).to_be_visible()
+    page.get_by_role("button", name="Stimmeinstellungen").click()
+    expect(page.get_by_text("Stimmen können nicht geladen werden")).to_be_visible()

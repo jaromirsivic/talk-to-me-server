@@ -11,9 +11,9 @@ def test_complete_operator_journey(page: Page, live_server) -> None:
     expect(page.locator("html")).to_have_attribute("data-theme", "dark")
 
     page.get_by_role("button", name="Voice Setup").click()
-    page.get_by_role("combobox", name="Search voices").fill("Amy")
+    page.get_by_role("searchbox", name="Search voices").fill("Amy")
     page.get_by_role(
-        "option", name=re.compile("amy.*download required", re.I)
+        "button", name=re.compile("amy.*download required", re.I)
     ).click()
     page.get_by_role("button", name="Download and use").click()
     expect(page.get_by_text("Voice downloaded")).to_be_visible()

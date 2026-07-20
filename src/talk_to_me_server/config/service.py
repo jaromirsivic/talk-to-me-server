@@ -42,7 +42,7 @@ class SettingsService:
         with self._lock:
             if self._current is None:
                 raise RuntimeError("settings service has not been initialized")
-            persisted = candidate.model_copy(deep=True)
+            persisted = Settings.model_validate(candidate.model_dump(mode="json"))
             restart_fields = persisted.restart_required_fields(self._current)
             atomic_write_json(self._path, persisted)
             self._current = persisted
@@ -57,6 +57,8 @@ def load_settings(path: Path, *, migrate_legacy_severity: bool = False) -> Setti
         del voice["severity"]
         migrated = True
     settings = Settings.model_validate(raw)
+    if migrate_legacy_severity and isinstance(voice, dict):
+        migrated = migrated or voice.get("language") != settings.voice.language
     if migrated:
         atomic_write_json(path, settings)
     return settings

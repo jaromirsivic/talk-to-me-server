@@ -11,6 +11,7 @@
   "voice": {
     "tts": "Piper",
     "speaker": "en_US-ljspeech-medium",
+    "language": "en_US",
     "volume": 100
   },
   "general": {

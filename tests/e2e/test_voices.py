@@ -62,7 +62,7 @@ def test_import_error_is_above_voice_dialog_and_can_be_closed(
 def test_voice_cancel_discards_selection_and_volume(page: Page, live_server) -> None:
     open_voice_setup(page, live_server)
     page.get_by_role(
-        "option", name=re.compile("amy.*download required", re.I)
+        "button", name=re.compile("amy.*download required", re.I)
     ).click()
     confirmation = page.get_by_role("dialog", name="Download voice")
     confirmation.get_by_role("button", name="Download and use").click()
@@ -98,7 +98,7 @@ def test_restricted_voice_confirms_then_activates_only_after_save(
 ) -> None:
     open_voice_setup(page, live_server)
     page.get_by_role(
-        "option", name=re.compile("locked voice.*confirmation required", re.I)
+        "button", name=re.compile("locked voice.*confirmation required", re.I)
     ).click()
     dialog = page.get_by_role("dialog", name="Confirm voice license")
     expect(dialog).to_contain_text("Locked Voice")
@@ -107,7 +107,7 @@ def test_restricted_voice_confirms_then_activates_only_after_save(
     page.get_by_role("button", name="Download and use").click()
     expect(page.get_by_text("Current voice: Locked Voice")).to_be_visible()
     installed = page.get_by_role(
-        "option", name=re.compile("locked voice.*installed", re.I)
+        "button", name=re.compile("locked voice.*installed", re.I)
     )
     status = installed.locator(".voice-status")
     expect(status).not_to_have_class(re.compile("requires-confirmation"))
@@ -124,7 +124,7 @@ def test_restricted_voice_confirms_then_activates_only_after_save(
 def test_free_voice_download_stages_selection_until_save(page: Page, live_server) -> None:
     open_voice_setup(page, live_server)
     page.get_by_role(
-        "option", name=re.compile("amy.*download required", re.I)
+        "button", name=re.compile("amy.*download required", re.I)
     ).click()
     expect(page.get_by_role("dialog", name="Download voice")).to_be_visible()
     page.get_by_role("button", name="Download and use").click()
@@ -140,9 +140,9 @@ def test_installed_voice_opens_delete_confirmation_and_can_be_deleted(
     page: Page, live_server
 ) -> None:
     open_voice_setup(page, live_server)
-    installed = page.get_by_role("option", name=re.compile("ljspeech.*installed", re.I))
+    installed = page.get_by_role("button", name=re.compile("ljspeech.*installed", re.I))
 
-    installed.click()
+    installed.locator("xpath=..").get_by_role("button", name="Delete voice").click()
 
     confirmation = page.get_by_role("dialog", name="Delete Voice")
     expect(confirmation).to_be_visible()
@@ -151,7 +151,7 @@ def test_installed_voice_opens_delete_confirmation_and_can_be_deleted(
     expect(confirmation).to_be_hidden()
     expect(page.get_by_text("Voice deleted")).to_be_visible()
     expect(
-        page.get_by_role("option", name=re.compile("ljspeech.*download required", re.I))
+        page.get_by_role("button", name=re.compile("ljspeech.*download required", re.I))
     ).to_be_visible()
 
 
@@ -160,7 +160,7 @@ def test_delayed_download_installs_but_does_not_mutate_reopened_voice_draft(
 ) -> None:
     open_voice_setup(page, live_server)
     page.set_extra_http_headers({"X-Test-Voice-Delay": "0.4"})
-    page.get_by_role("option", name=re.compile("amy.*download required", re.I)).click()
+    page.get_by_role("button", name=re.compile("amy.*download required", re.I)).click()
     confirmation = page.get_by_role("dialog", name="Download voice")
     confirmation.get_by_role("button", name="Download and use").click()
     progress = confirmation.locator("#download-voice-progress")
@@ -184,7 +184,7 @@ def test_delayed_download_installs_but_does_not_mutate_reopened_voice_draft(
 
     expect(page.get_by_text("Current voice: LJSpeech")).to_be_visible()
     expect(page.get_by_label("Voice volume")).to_have_value("73")
-    expect(page.get_by_role("option", name=re.compile("amy.*installed", re.I))).to_be_visible()
+    expect(page.get_by_role("button", name=re.compile("amy.*installed", re.I))).to_be_visible()
 
 
 def test_delayed_import_installs_but_does_not_mutate_reopened_voice_draft(
@@ -214,24 +214,24 @@ def test_delayed_import_installs_but_does_not_mutate_reopened_voice_draft(
     expect(page.get_by_text("Current voice: LJSpeech")).to_be_visible()
     expect(page.get_by_label("Voice volume")).to_have_value("77")
     expect(
-        page.get_by_role("option", name=re.compile("delayed voice.*installed", re.I))
+        page.get_by_role("button", name=re.compile("delayed voice.*installed", re.I))
     ).to_be_visible()
 
 
 def test_all_and_downloaded_filters_compose_with_search(page: Page, live_server) -> None:
     open_voice_setup(page, live_server)
-    search = page.get_by_role("combobox", name="Search voices")
-    voices = page.get_by_role("listbox", name="Available voices")
-    expect(voices.get_by_role("option")).to_have_count(4)
+    search = page.get_by_role("searchbox", name="Search voices")
+    voices = page.get_by_role("list", name="Available voices")
+    expect(voices.locator(".voice-option")).to_have_count(4)
 
     page.get_by_role("button", name="Already downloaded").click()
-    expect(voices.get_by_role("option")).to_have_count(1)
-    expect(voices.get_by_role("option", name=re.compile("ljspeech", re.I))).to_be_visible()
+    expect(voices.locator(".voice-option")).to_have_count(1)
+    expect(voices.get_by_role("button", name=re.compile("ljspeech", re.I))).to_be_visible()
     search.fill("amy")
     expect(page.get_by_text("No voices found")).to_be_visible()
 
     page.get_by_role("button", name="All voices").click()
-    expect(voices.get_by_role("option", name=re.compile("amy", re.I))).to_be_visible()
+    expect(voices.get_by_role("button", name=re.compile("amy", re.I))).to_be_visible()
 
 
 def test_invalid_voice_is_unavailable_and_has_no_download_icon(
@@ -239,7 +239,7 @@ def test_invalid_voice_is_unavailable_and_has_no_download_icon(
 ) -> None:
     open_voice_setup(page, live_server)
     invalid = page.get_by_role(
-        "option",
+        "button",
         name=re.compile("broken voice.*unavailable.*missing voice metadata", re.I),
     )
 
@@ -248,44 +248,68 @@ def test_invalid_voice_is_unavailable_and_has_no_download_icon(
     expect(page.get_by_role("dialog", name="Download voice")).not_to_be_visible()
 
 
-def test_voice_rebuild_clears_stale_active_descendant(page: Page, live_server) -> None:
+def test_voice_search_arrows_focus_the_first_visible_voice(page: Page, live_server) -> None:
     open_voice_setup(page, live_server)
-    search = page.get_by_role("combobox", name="Search voices")
+    search = page.get_by_role("searchbox", name="Search voices")
     search.press("ArrowDown")
-    expect(search).to_have_attribute("aria-activedescendant", re.compile("voice-option-"))
-
-    search.fill("amy")
-    expect(search).not_to_have_attribute("aria-activedescendant", re.compile(".+"))
+    expect(
+        page.get_by_role("button", name=re.compile("ljspeech.*installed", re.I))
+    ).to_be_focused()
 
 
 def test_installed_voice_delete_cancel_restores_focus(
     page: Page, live_server
 ) -> None:
     open_voice_setup(page, live_server)
-    installed = page.get_by_role("option", name=re.compile("ljspeech.*installed", re.I))
-    installed.focus()
-    installed.press("Enter")
+    installed = page.get_by_role("button", name=re.compile("ljspeech.*installed", re.I))
+    delete_button = installed.locator("xpath=..").get_by_role(
+        "button", name="Delete voice"
+    )
+    delete_button.focus()
+    delete_button.press("Enter")
     confirmation = page.get_by_role("dialog", name="Delete Voice")
     expect(confirmation).to_be_visible()
     confirmation.get_by_role("button", name="Cancel").click()
 
-    expect(
-        page.get_by_role("option", name=re.compile("ljspeech.*installed", re.I))
-    ).to_be_focused()
+    expect(delete_button).to_be_focused()
+
+
+def test_installed_voice_row_stages_selection_until_save(page: Page, live_server) -> None:
+    open_voice_setup(page, live_server)
+    page.get_by_role("button", name=re.compile("amy.*download required", re.I)).click()
+    page.get_by_role("button", name="Download and use").click()
+    page.get_by_role("button", name="Save settings").click()
+
+    page.get_by_role("button", name="Voice Setup").click()
+    page.get_by_role("button", name=re.compile("ljspeech.*installed", re.I)).click()
+    confirmation = page.get_by_role("dialog", name="Select Voice")
+    expect(confirmation).to_contain_text("Use LJSpeech as the active voice?")
+    confirmation.get_by_role("button", name="Use voice").click()
+    expect(page.get_by_text("Current voice: LJSpeech")).to_be_visible()
+    page.get_by_role("button", name="Save settings").click()
+
+    page.reload()
+    page.get_by_role("button", name="Voice Setup").click()
+    expect(page.get_by_text("Current voice: LJSpeech")).to_be_visible()
 
 
 def test_completed_download_restores_focus_to_rebuilt_voice_option(
     page: Page, live_server
 ) -> None:
     open_voice_setup(page, live_server)
-    page.get_by_role("option", name=re.compile("amy.*download required", re.I)).click()
+    page.get_by_role("button", name=re.compile("amy.*download required", re.I)).click()
     page.get_by_role("dialog", name="Download voice").get_by_role(
         "button", name="Download and use"
     ).click()
 
-    installed = page.get_by_role("option", name=re.compile("amy.*installed", re.I))
+    installed = page.get_by_role("button", name=re.compile("amy.*installed", re.I))
     expect(installed).to_be_focused()
-    expect(installed.locator(".voice-size")).to_have_text("63 MB")
+    expect(installed.locator(".voice-status-details")).to_have_count(0)
+    expect(
+        installed.locator("xpath=..").get_by_role(
+            "button", name="Delete voice (63 MB)"
+        )
+    ).to_be_visible()
     expect(installed).to_have_attribute("title", str(Path("downloaded.onnx").resolve()))
 
 
@@ -321,7 +345,7 @@ def test_local_import_stages_custom_voice_and_shows_custom_badge_only(
 
     expect(page.get_by_text("Voice imported")).to_be_visible()
     expect(page.get_by_text("Current voice: My Voice")).to_be_visible()
-    custom = page.get_by_role("option", name=re.compile("my voice.*installed", re.I))
+    custom = page.get_by_role("button", name=re.compile("my voice.*installed", re.I))
     expect(custom.get_by_text("Custom", exact=True)).to_be_visible()
     page.get_by_role("button", name="Cancel", exact=True).click()
     page.get_by_role("button", name="Voice Setup").click()

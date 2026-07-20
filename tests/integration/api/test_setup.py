@@ -4,6 +4,7 @@ def test_get_setup_accepts_empty_or_empty_object(client) -> None:
 
     assert without_body.status_code == with_object.status_code == 200
     assert with_object.json()["setup"]["voice"]["speaker"] == "en_US-ljspeech-medium"
+    assert with_object.json()["setup"]["voice"]["language"] == "en_US"
     assert "severity" not in with_object.json()["setup"]["voice"]
 
 
@@ -51,6 +52,18 @@ def test_set_setup_rejects_legacy_voice_severity(client) -> None:
     response = client.post("/api/v1/setSetup", json={"setup": current})
 
     assert response.status_code == response.json()["reasonCode"] == 400
+
+
+def test_set_setup_rederives_language_from_speaker(client, runtime) -> None:
+    current = client.post("/api/v1/getSetup", json={}).json()["setup"]
+    current["voice"]["speaker"] = "cs_CZ-jirka-medium"
+    current["voice"]["language"] = "de_DE"
+
+    response = client.post("/api/v1/setSetup", json={"setup": current})
+
+    assert response.status_code == 200
+    assert response.json()["setup"]["voice"]["language"] == "cs_CZ"
+    assert runtime.settings.current().voice.language == "cs_CZ"
 
 
 def test_runtime_limits_are_reported_as_restart_required(client, runtime) -> None:
