@@ -40,7 +40,7 @@ def test_run_script_tracks_its_own_pid_and_removes_only_its_pid_file() -> None:
 
 
 def test_install_batch_delegates_to_install_script_and_preserves_exit_code() -> None:
-    text = Path("Install.bat").read_text(encoding="utf-8").lower()
+    text = Path("install.bat").read_text(encoding="utf-8").lower()
 
     assert "%~dp0install.ps1" in text
     assert "-executionpolicy bypass" in text
@@ -48,7 +48,7 @@ def test_install_batch_delegates_to_install_script_and_preserves_exit_code() -> 
 
 
 def test_start_batch_launches_one_tracked_server_process() -> None:
-    text = Path("startserver.bat").read_text(encoding="utf-8").lower()
+    text = Path("start-server.bat").read_text(encoding="utf-8").lower()
 
     assert "run.ps1" in text
     assert "server.pid" in text
@@ -58,7 +58,7 @@ def test_start_batch_launches_one_tracked_server_process() -> None:
 
 
 def test_start_batch_waits_for_listener_and_prints_browser_url_last() -> None:
-    text = Path("startserver.bat").read_text(encoding="utf-8")
+    text = Path("start-server.bat").read_text(encoding="utf-8")
 
     assert "Get-NetTCPConnection" in text
     assert "RedirectStandardError" in text
@@ -75,7 +75,7 @@ def test_start_batch_waits_for_listener_and_prints_browser_url_last() -> None:
 
 
 def test_stop_batch_validates_and_stops_only_the_tracked_process_tree() -> None:
-    text = Path("stopserver.bat").read_text(encoding="utf-8").lower()
+    text = Path("stop-server.bat").read_text(encoding="utf-8").lower()
 
     assert "server.pid" in text
     assert "get-ciminstance" in text
@@ -86,7 +86,7 @@ def test_stop_batch_validates_and_stops_only_the_tracked_process_tree() -> None:
 
 
 def test_stop_batch_finds_a_legacy_project_server_when_pid_file_is_missing() -> None:
-    text = Path("stopserver.bat").read_text(encoding="utf-8").lower()
+    text = Path("stop-server.bat").read_text(encoding="utf-8").lower()
 
     assert "if (-not (test-path -literalpath $pidfile)) { write-host 'talktome server is not running.'; exit 0 }" not in text
     assert ".venv" in text
@@ -96,7 +96,7 @@ def test_stop_batch_finds_a_legacy_project_server_when_pid_file_is_missing() -> 
 
 
 def test_stop_batch_always_reports_configured_port_owner() -> None:
-    text = Path("stopserver.bat").read_text(encoding="utf-8").lower()
+    text = Path("stop-server.bat").read_text(encoding="utf-8").lower()
 
     assert "data\\setup.json" in text
     assert "master-data\\setup.json" in text
@@ -119,3 +119,40 @@ def test_install_manifest_pins_official_uv_artifact() -> None:
         "a047d55651bc3e0ca24595b25ec4cfcb10f9dca9fb56514e661269b37d4fae68"
     )
     assert manifest["defaultVoice"]["id"] == "en_US-ljspeech-medium"
+
+
+def test_unix_installer_supports_linux_and_macos_without_system_install() -> None:
+    text = Path("install.sh").read_text(encoding="utf-8")
+
+    assert 'Darwin)' in text
+    assert 'Linux)' in text
+    assert 'x86_64|amd64)' in text
+    assert 'arm64|aarch64)' in text
+    assert 'UV_PROJECT_ENVIRONMENT="$project_root/.venv"' in text
+    assert 'python install 3.12' in text
+    assert 'sync --frozen --no-dev' in text
+    assert 'bootstrap --download-default-voice' in text
+    assert 'sha256sum' in text and 'shasum -a 256' in text
+    assert '/usr/local' not in text
+    assert 'sudo ' not in text
+
+
+def test_unix_start_script_tracks_and_validates_the_server() -> None:
+    text = Path("start-server.sh").read_text(encoding="utf-8")
+
+    assert '.venv/bin/python' in text
+    assert 'server.pid' in text
+    assert 'nohup "$python_bin" -m talk_to_me_server' in text
+    assert 'ps -p "$server_pid" -o command=' in text
+    assert 'Portal URL: ' in text
+    assert 'socket.create_connection' in text
+
+
+def test_unix_stop_script_only_stops_the_validated_server() -> None:
+    text = Path("stop-server.sh").read_text(encoding="utf-8")
+
+    assert 'server.pid' in text
+    assert 'ps -p "$server_pid" -o command=' in text
+    assert 'Refusing to stop it' in text
+    assert 'kill -TERM "$server_pid"' in text
+    assert 'kill -KILL "$server_pid"' in text

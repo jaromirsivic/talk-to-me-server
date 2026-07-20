@@ -56,5 +56,5 @@ $state = [ordered]@{
 $state | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $runtimeRoot "install-state.json") -Encoding UTF8
 
 Write-Host "TalkToMe is installed locally."
-Write-Host ("Run: powershell -NoProfile -ExecutionPolicy Bypass -File `"" + (Join-Path $projectRoot "run.ps1") + "`"")
+Write-Host ("Run: " + (Join-Path $projectRoot "start-server.bat"))
 Write-Host ("Data: " + (Join-Path $projectRoot "data"))

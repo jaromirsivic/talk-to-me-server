@@ -10,7 +10,7 @@ Requirements: Windows 10/11, PowerShell 5.1 or newer, internet access for the fi
 and an audio output device. Python and Piper do not need to be preinstalled.
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
+.\install.bat
 ```
 
 The idempotent installer downloads a pinned, SHA-256-verified `uv`, installs Python 3.12 and
@@ -20,8 +20,34 @@ the locked dependencies into this project, then downloads the default
 Start the server:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\run.ps1
+.\start-server.bat
 ```
+
+Stop the server with `.\stop-server.bat`.
+
+## Install on Linux or macOS
+
+Requirements: x86_64 or ARM64 Linux/macOS, internet access for the first install, `curl` or
+`wget`, `tar`, a SHA-256 utility, and an audio output device. Linux also needs the PortAudio
+runtime library supplied by the distribution, typically the `libportaudio2` package on
+Debian and Ubuntu. Python and Piper do not need to be preinstalled.
+
+The same scripts support both operating systems:
+
+```sh
+sh ./install.sh
+sh ./start-server.sh
+```
+
+Stop the server with:
+
+```sh
+sh ./stop-server.sh
+```
+
+The Unix installer downloads a pinned, SHA-256-verified `uv` archive for the detected
+operating system and CPU architecture. Like the Windows installer, it keeps Python, the
+environment, downloads, and cache inside this project and does not change the system `PATH`.
 
 Open <http://127.0.0.1:44448/>. All API operations use `POST`; see
 [`docs/api.md`](docs/api.md). Operational, backup, security, and recovery guidance is in
@@ -54,6 +80,6 @@ uv run pytest -q
 Browser tests require Chromium installed by Playwright. Real Piper and Windows audio smoke
 tests are opt-in; the default test suite does not play sound.
 
-Linux and macOS are planned targets. The domain, API, queue, catalog, storage, and portal are
-portable; only packaging, launch scripts, and platform audio adapters need platform work.
+Linux and macOS use the same project-local installation and process-control scripts. Audio
+uses the existing `sounddevice` adapter, backed by PortAudio on Linux and CoreAudio on macOS.
 See the portability table in [`docs/operations.md`](docs/operations.md#platform-roadmap).
