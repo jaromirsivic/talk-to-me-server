@@ -16,6 +16,7 @@
   "composer.reset": "Нулиране",
   "composer.maximize": "Увеличете редактора на заявки",
   "composer.restore": "Редактор на заявка за възстановяване",
+  "composer.stop": "Спиране",
   "composer.status": "JSON се проверява преди изпращане",
   "composer.send": "Изпратете заявка",
   "composer.sending": "Изпращане на заявка...",

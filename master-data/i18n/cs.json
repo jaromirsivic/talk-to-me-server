@@ -16,6 +16,7 @@
   "composer.reset": "Resetovat",
   "composer.maximize": "Maximalizovat editor požadavku",
   "composer.restore": "Obnovit velikost editoru požadavku",
+  "composer.stop": "Zastavit",
   "composer.status": "JSON se před odesláním ověří",
   "composer.send": "Odeslat požadavek",
   "composer.sending": "Odesílání požadavku…",

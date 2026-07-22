@@ -16,7 +16,7 @@ def test_all_locale_files_have_exactly_the_english_keys() -> None:
     assert set(paths) == EXPECTED
     baseline = json.loads(paths["en"].read_text(encoding="utf-8"))
     required = {
-        "composer.maximize", "composer.restore",
+        "composer.maximize", "composer.restore", "composer.stop",
         "code.copy", "code.copied", "code.wordWrap", "code.lineNumbers",
         "chat.region", "chat.firstMessageNotice", "voice.title", "voice.current",
         "voice.language", "voice.volume", "voice.search", "voice.filter.all",

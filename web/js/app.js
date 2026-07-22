@@ -11,6 +11,7 @@ import {initializeVoices} from "./voices.js";
 const editor = document.querySelector("#request-json");
 const editorView = document.querySelector(".composer-editor");
 const sendButton = document.querySelector("#send-request");
+const stopButton = document.querySelector("#stop-playback");
 const resetButton = document.querySelector("#reset-request");
 const resetDialog = document.querySelector("#reset-confirm-dialog");
 const confirmResetButton = document.querySelector("#confirm-reset");
@@ -24,6 +25,9 @@ const errorDialog = document.querySelector("#json-error-dialog");
 const errorMessage = document.querySelector("#json-error-message");
 let initialRequest = null;
 let editorControls = null;
+let queuePollTimer = null;
+let stopRequestInFlight = false;
+const QUEUE_POLL_INTERVAL_MS = 1_000;
 
 const fallbackRequest = {
   value: "If you here this voice then talk to me server works. You can play positive gong {{play('positive_gong.wav')}} or neutral gong {{play('neutral_gong.wav')}} or negative gong {{play('negative_gong.wav')}}. And make a pause {{pause(2000)}} in the middle of a text. {{pause(500)}} You can control the priority of text to speech conversion using the importance parameter. If importance is set to high, the text is added to the end of the queue and played when its turn comes. If importance is set to low, the text is played immediately if the queue is empty. If there is at least one text item waiting in the queue, it is not played at all. {{pause(500)}} You can adjust the text volume using the volume multiplier parameter. {{pause(500)}} Setting the calculate stats parameter to true runs the model’s performance tests. {{pause(500)}} And if you want to wait until the entire text has been played, set wait until playback finished to true. If wait until playback finished parameter is set to false, the server returns a response immediately.",
@@ -68,6 +72,49 @@ async function sendRequest() {
     status.textContent = translate("composer.transportError");
   } finally {
     sendButton.disabled = false;
+  }
+}
+
+function scheduleQueuePoll() {
+  clearTimeout(queuePollTimer);
+  queuePollTimer = setTimeout(pollQueueInfo, QUEUE_POLL_INTERVAL_MS);
+}
+
+async function pollQueueInfo() {
+  queuePollTimer = null;
+  if (stopRequestInFlight) {
+    scheduleQueuePoll();
+    return;
+  }
+  try {
+    const result = await postApi("queueInfo", {mode: "min"});
+    if (stopRequestInFlight) return;
+    const valid = result.status < 400
+      && typeof result.body.hasActiveJobs === "boolean"
+      && Number.isInteger(result.body.activeJobCount)
+      && result.body.activeJobCount >= 0
+      && result.body.hasActiveJobs === (result.body.activeJobCount > 0);
+    stopButton.disabled = !valid || !result.body.hasActiveJobs;
+  } catch (_error) {
+    stopButton.disabled = true;
+  } finally {
+    scheduleQueuePoll();
+  }
+}
+
+async function stopPlayback() {
+  if (stopButton.disabled || stopRequestInFlight) return;
+  stopRequestInFlight = true;
+  stopButton.disabled = true;
+  clearTimeout(queuePollTimer);
+  queuePollTimer = null;
+  try {
+    await postApi("stop", {});
+  } catch (_error) {
+    stopButton.disabled = true;
+  } finally {
+    stopRequestInFlight = false;
+    scheduleQueuePoll();
   }
 }
 
@@ -163,6 +210,7 @@ function setComposerMaximized(maximized) {
 }
 
 sendButton.addEventListener("click", sendRequest);
+stopButton.addEventListener("click", stopPlayback);
 editor.addEventListener("keydown", (event) => {
   if ((event.ctrlKey || event.metaKey) && event.key === "Enter") sendRequest();
 });
@@ -186,6 +234,7 @@ editorControls = initializeCodeControls({scope: composer, view: editorView, text
 initializeComposerControls();
 initializeBaseDialogs();
 initializeVoices();
+scheduleQueuePoll();
 const settingsReady = initializeSettings();
 settingsReady.then(initializeTheme).catch((error) => {
   status.textContent = error.message;

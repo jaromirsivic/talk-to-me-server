@@ -16,6 +16,7 @@
   "composer.reset": "Atiestatīt",
   "composer.maximize": "Maksimizēt pieprasījuma redaktoru",
   "composer.restore": "Atjaunot pieprasījumu redaktoru",
+  "composer.stop": "Apturēt",
   "composer.status": "Pirms nosūtīšanas JSON tiek pārbaudīts",
   "composer.send": "Nosūtīt pieprasījumu",
   "composer.sending": "Pieprasījuma nosūtīšana",

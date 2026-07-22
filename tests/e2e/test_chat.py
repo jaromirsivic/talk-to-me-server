@@ -85,6 +85,61 @@ def test_reset_requires_confirmation_and_restores_default_request(
     expect(page.locator(".chat-card")).to_have_count(0)
 
 
+def test_stop_button_follows_queue_polling_and_stays_disabled_for_one_second(
+    page: Page, live_server
+) -> None:
+    queue_state = {"active": False}
+    stop_requests = []
+
+    def route_queue_info(route) -> None:
+        active = queue_state["active"]
+        route.fulfill(
+            status=200,
+            content_type="application/json",
+            body=json.dumps(
+                {
+                    "version": 1,
+                    "reasonCode": 200,
+                    "reasonText": "OK",
+                    "hasActiveJobs": active,
+                    "activeJobCount": 1 if active else 0,
+                }
+            ),
+        )
+
+    def route_stop(route) -> None:
+        stop_requests.append(True)
+        route.fulfill(
+            status=200,
+            content_type="application/json",
+            body=json.dumps(
+                {
+                    "version": 1,
+                    "reasonCode": 200,
+                    "reasonText": "Playback stopped",
+                    "cancelledJobs": 1,
+                }
+            ),
+        )
+
+    page.route("**/api/v1/queueInfo", route_queue_info)
+    page.route("**/api/v1/stop", route_stop)
+    page.goto(live_server.url)
+    stop = page.get_by_role("button", name="Stop")
+    expect(stop).to_be_disabled()
+
+    queue_state["active"] = True
+    expect(stop).to_be_enabled(timeout=2_500)
+    stop.click()
+    expect(stop).to_be_disabled()
+    assert len(stop_requests) == 1
+
+    page.wait_for_timeout(700)
+    expect(stop).to_be_disabled()
+    expect(stop).to_be_enabled(timeout=1_500)
+    assert len(stop_requests) == 1
+
+
 def test_composer_copy_writes_the_exact_editor_json_to_clipboard(
     page: Page, live_server
 ) -> None:

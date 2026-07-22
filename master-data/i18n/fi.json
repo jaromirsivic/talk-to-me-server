@@ -16,6 +16,7 @@
   "composer.reset": "Nollaa",
   "composer.maximize": "Maksimoi pyyntöeditori",
   "composer.restore": "Palauta pyyntöeditori",
+  "composer.stop": "Pysäytä",
   "composer.status": "JSON tarkistetaan ennen lähettämistä",
   "composer.send": "Lähetä pyyntö",
   "composer.sending": "Pyynnön lähettäminen",

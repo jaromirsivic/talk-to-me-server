@@ -16,6 +16,7 @@
   "composer.reset": "Resetați",
   "composer.maximize": "Maximizați editorul de solicitări",
   "composer.restore": "Restaurați editorul de solicitări",
+  "composer.stop": "Oprire",
   "composer.status": "JSON este validat înainte de trimitere",
   "composer.send": "Trimiteți cererea",
   "composer.sending": "Se trimite cererea...",

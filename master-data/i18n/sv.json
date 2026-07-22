@@ -16,6 +16,7 @@
   "composer.reset": "Återställ",
   "composer.maximize": "Maximera begäran editor",
   "composer.restore": "Återställ förfrågningsredigerare",
+  "composer.stop": "Stoppa",
   "composer.status": "JSON valideras innan sändning",
   "composer.send": "Skicka förfrågan",
   "composer.sending": "Skickar förfrågan…",

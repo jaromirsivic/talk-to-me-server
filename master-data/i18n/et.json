@@ -16,6 +16,7 @@
   "composer.reset": "Lähtesta",
   "composer.maximize": "Maksimeeri taotluse redaktor",
   "composer.restore": "Taastage päringu redaktor",
+  "composer.stop": "Peata",
   "composer.status": "JSON valideeritakse enne saatmist",
   "composer.send": "Saada taotlus",
   "composer.sending": "Sending requestâ€¦",

@@ -16,6 +16,7 @@
   "composer.reset": "Visszaállítás",
   "composer.maximize": "Maximális kérésszerkesztő",
   "composer.restore": "Kérelemszerkesztő visszaállítása",
+  "composer.stop": "Leállítás",
   "composer.status": "A JSON ellenőrzésre kerül a küldés előtt",
   "composer.send": "Kérelem küldése",
   "composer.sending": "Kérelem küldése",

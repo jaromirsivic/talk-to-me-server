@@ -16,6 +16,7 @@
   "composer.reset": "重置",
   "composer.maximize": "最大化请求编辑器",
   "composer.restore": "恢复请求编辑器",
+  "composer.stop": "停止",
   "composer.status": "JSON 在发送前进行验证",
   "composer.send": "发送请求",
   "composer.sending": "正在发送请求……",

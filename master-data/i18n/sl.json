@@ -16,6 +16,7 @@
   "composer.reset": "Ponastavi",
   "composer.maximize": "Povečanje urejevalnika zahtev",
   "composer.restore": "Urejevalnik zahtev za obnovitev",
+  "composer.stop": "Ustavi",
   "composer.status": "JSON je preverjen pred pošiljanjem",
   "composer.send": "Pošlji zahtevo",
   "composer.sending": "Pošiljanje zahteve...",

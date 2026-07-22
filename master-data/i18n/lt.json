@@ -16,6 +16,7 @@
   "composer.reset": "Nustatyti iš naujo",
   "composer.maximize": "Maksimalus užklausų redaktorius",
   "composer.restore": "Atkurti užklausų rengyklę",
+  "composer.stop": "Stabdyti",
   "composer.status": "JSON patvirtinamas prieš siunčiant",
   "composer.send": "Siųsti prašymą",
   "composer.sending": "Prašymo siuntimas",

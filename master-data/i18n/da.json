@@ -16,6 +16,7 @@
   "composer.reset": "Nulstil",
   "composer.maximize": "Maksimer anmodningseditor",
   "composer.restore": "Gendan anmodningseditor",
+  "composer.stop": "Stop",
   "composer.status": "JSON er valideret før afsendelse",
   "composer.send": "Send anmodning",
   "composer.sending": "Sender anmodning…",

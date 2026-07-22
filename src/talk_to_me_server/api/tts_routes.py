@@ -7,11 +7,37 @@ from pydantic import ValidationError
 from starlette.background import BackgroundTask
 
 from talk_to_me_server.api.envelopes import envelope
-from talk_to_me_server.api.schemas import TextToSpeechRequest
+from talk_to_me_server.api.schemas import QueueInfoMode, QueueInfoRequest, TextToSpeechRequest
 from talk_to_me_server.domain.stats import calculate_stats
 
 
 router = APIRouter(prefix="/api/v1")
+
+
+@router.post("/queueInfo")
+async def queue_info(
+    request: Request, payload: QueueInfoRequest | None = None
+) -> JSONResponse:
+    runtime = request.app.state.runtime
+    if runtime.queue is None:
+        return envelope(503, "Text-to-speech runtime is unavailable")
+    mode = payload.mode if payload is not None else QueueInfoMode.MAX
+    if mode is QueueInfoMode.MIN:
+        active_count = await runtime.queue.active_count_snapshot()
+        return envelope(
+            200,
+            "OK",
+            hasActiveJobs=active_count > 0,
+            activeJobCount=active_count,
+        )
+    jobs = await runtime.queue.active_snapshot()
+    return envelope(
+        200,
+        "OK",
+        hasActiveJobs=bool(jobs),
+        activeJobCount=len(jobs),
+        jobs=jobs,
+    )
 
 
 @router.post("/stop")

@@ -16,6 +16,7 @@
   "composer.reset": "Скинути",
   "composer.maximize": "Розгорнути редактор запитів",
   "composer.restore": "Редактор запитів на відновлення",
+  "composer.stop": "Зупинити",
   "composer.status": "JSON перевіряється перед надсиланням",
   "composer.send": "Надіслати запит",
   "composer.sending": "Надсилання запиту...",

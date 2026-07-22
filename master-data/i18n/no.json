@@ -16,6 +16,7 @@
   "composer.reset": "Tilbakestill",
   "composer.maximize": "Maksimer forespørselsredigering",
   "composer.restore": "Gjenopprett forespørselsredigering",
+  "composer.stop": "Stopp",
   "composer.status": "JSON er validert før sending",
   "composer.send": "Send forespørsel",
   "composer.sending": "Sender forespørsel…",

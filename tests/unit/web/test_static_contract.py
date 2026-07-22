@@ -14,7 +14,8 @@ def test_portal_has_semantic_shell_and_accessible_json_composer() -> None:
     assert 'data-i18n-aria-label="chat.region"' in html
     assert 'id="benchmark-request"' not in html
     assert 'id="reset-confirm-dialog"' in html
-    assert 'src="/js/app.js?v=sprint-0002"' in html
+    assert 'href="/styles.css?v=sprint-0003"' in html
+    assert 'src="/js/app.js?v=sprint-0003"' in html
 
 
 def test_first_message_notice_is_inserted_before_the_first_request() -> None:
@@ -272,6 +273,23 @@ def test_download_voice_has_one_heading_and_send_button_has_no_arrow() -> None:
     assert 'data-i18n="voice.download"' in download_dialog
     assert 'aria-hidden="true"' not in send_button
     assert "→" not in send_button
+
+
+def test_composer_has_localized_stop_button_and_non_overlapping_queue_polling() -> None:
+    html = Path("web/index.html").read_text(encoding="utf-8")
+    app = Path("web/js/app.js").read_text(encoding="utf-8")
+    css = Path("web/styles.css").read_text(encoding="utf-8")
+    stop_start = html.index('id="stop-playback"')
+    send_start = html.index('id="send-request"')
+
+    assert stop_start < send_start
+    assert 'id="stop-playback" type="button" disabled' in html
+    assert 'data-i18n="composer.stop"' in html
+    assert 'postApi("queueInfo", {mode: "min"})' in app
+    assert 'postApi("stop", {})' in app
+    assert "setTimeout(pollQueueInfo, QUEUE_POLL_INTERVAL_MS)" in app
+    assert ".stop-button" in css
+    assert "background: var(--danger)" in css
 
 
 def test_voice_dynamic_fallbacks_are_localized() -> None:

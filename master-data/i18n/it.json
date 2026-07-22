@@ -16,6 +16,7 @@
   "composer.reset": "Ripristina",
   "composer.maximize": "Massimizza l'editor delle richieste",
   "composer.restore": "Ripristina l'editor delle richieste",
+  "composer.stop": "Interrompi",
   "composer.status": "JSON viene convalidato prima dell'invio",
   "composer.send": "Invia richiesta",
   "composer.sending": "Invio richiesta…",

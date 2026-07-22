@@ -80,6 +80,26 @@ async def test_terminal_job_held_for_waiter_is_not_active_for_low_or_capacity(qu
 
 
 @pytest.mark.asyncio
+async def test_active_snapshot_excludes_terminal_jobs_and_includes_worker_details(queue) -> None:
+    terminal = (await queue.enqueue(TextToSpeechRequest(values=["done"]), snapshot())).job
+    active = (
+        await queue.enqueue(TextToSpeechRequest(values=["first", "second"]), snapshot())
+    ).job
+    assert terminal is not None and active is not None
+    await queue.fail(terminal.id, JobError(code=500, message="failed"))
+    await queue.claim_for_synthesis(wait=False)
+    await queue.mark_value_processing(active.id, 0)
+    await queue.record_value_worker_index(active.id, 0, 2)
+
+    jobs = await queue.active_snapshot()
+
+    assert [job["id"] for job in jobs] == [active.id]
+    assert jobs[0]["state"] == "processing"
+    assert jobs[0]["values"][0]["workerIndex"] == 2
+    assert jobs[0]["values"][0]["totalWorkers"] == 4
+
+
+@pytest.mark.asyncio
 async def test_volume_multiplier_is_clamped_and_applied_to_snapshot(queue) -> None:
     low = await queue.enqueue(
         TextToSpeechRequest(values=["quiet"], volume_multiplier=-0.5), snapshot()

@@ -59,3 +59,11 @@
 - Katalog vyhodnocuje relativní cesty vůči adresáři manifestu a u staré neplatné absolutní cesty použije odpovídající lokální soubor vedle `voice.json`.
 - Regresní testy ověřují relativní cesty stažených i importovaných hlasů a obnovu starých manifestů.
 - Do `.administration/future_improvements.md` byla uložena diagnostika a doporučení k jednoduché záložní segmentaci textu.
+
+## Informace o frontě a ovládání Stop
+
+- Přidán endpoint `POST /api/v1/queueInfo` s úsporným režimem `min` a podrobným režimem `max`.
+- Maximální režim vrací konzistentní snímek aktivních jobů, jejich rozparsovaných hodnot, stavů, časů, workerů a chyb.
+- Webový portál každou sekundu zjišťuje stav fronty a podle něj řídí lokalizované červené tlačítko Stop.
+- Stop okamžitě zakáže ovládací prvek, zruší frontu a zastaví zvuk, přičemž zachová syntetizační worker pool pro další požadavky.
+- Doplněny překlady ve všech podporovaných jazycích, verzování webových prostředků, API dokumentace a automatické testy.

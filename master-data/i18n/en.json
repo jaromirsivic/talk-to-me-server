@@ -16,6 +16,7 @@
   "composer.reset": "Reset",
   "composer.maximize": "Maximize request editor",
   "composer.restore": "Restore request editor",
+  "composer.stop": "Stop",
   "composer.status": "JSON is validated before sending",
   "composer.send": "Send request",
   "composer.sending": "Sending request…",

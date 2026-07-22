@@ -16,6 +16,7 @@
   "composer.reset": "Athshocraigh",
   "composer.maximize": "Eagarthóir iarratais a uasmhéadú",
   "composer.restore": "Athchóirigh eagarthóir iarratais",
+  "composer.stop": "Stad",
   "composer.status": "Tá JSON bailíochtaithe roimh é a sheoladh",
   "composer.send": "Seol iarratas",
   "composer.sending": "Iarratas á sheoladhâ€¦",

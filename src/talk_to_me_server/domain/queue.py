@@ -88,6 +88,18 @@ class QueueManager:
     def active_ids(self) -> tuple[str, ...]:
         return tuple(job.id for job in self._jobs.values() if not job.state.is_terminal)
 
+    async def active_count_snapshot(self) -> int:
+        async with self._condition:
+            return self.active_count
+
+    async def active_snapshot(self) -> tuple[dict, ...]:
+        async with self._condition:
+            return tuple(
+                job.to_dict(include_worker_details=True)
+                for job in self._jobs.values()
+                if not job.state.is_terminal
+            )
+
     def get(self, job_id: str) -> Job | None:
         return self._jobs.get(job_id)
 

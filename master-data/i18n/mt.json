@@ -16,6 +16,7 @@
   "composer.reset": "Irrisettja",
   "composer.maximize": "Timmassimizza l-editur tat-talba",
   "composer.restore": "Irrestawra l-editur tat-talba",
+  "composer.stop": "Waqqaf",
   "composer.status": "JSON jiġi vvalidat qabel ma jintbagħat",
   "composer.send": "Ibgħat it-talba",
   "composer.sending": "Tibgħat it-talba...",

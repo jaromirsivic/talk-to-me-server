@@ -16,6 +16,7 @@
   "composer.reset": "Επαναφορά",
   "composer.maximize": "Μεγιστοποιήστε το πρόγραμμα επεξεργασίας αιτημάτων",
   "composer.restore": "Επαναφορά προγράμματος επεξεργασίας αιτημάτων",
+  "composer.stop": "Διακοπή",
   "composer.status": "Το JSON επικυρώνεται πριν από την αποστολή",
   "composer.send": "Αποστολή αιτήματος",
   "composer.sending": "Αποστολή αιτήματος",

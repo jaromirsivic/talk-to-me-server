@@ -16,6 +16,7 @@
   "composer.reset": "リセット",
   "composer.maximize": "リクエストエディターを最大化する",
   "composer.restore": "復元リクエストエディター",
+  "composer.stop": "停止",
   "composer.status": "JSON は送信前に検証されます",
   "composer.send": "リクエストの送信",
   "composer.sending": "リクエストを送信中...",

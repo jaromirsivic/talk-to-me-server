@@ -16,6 +16,7 @@
   "composer.reset": "Opnieuw instellen",
   "composer.maximize": "Verzoekeditor maximaliseren",
   "composer.restore": "Verzoekeditor herstellen",
+  "composer.stop": "Stoppen",
   "composer.status": "JSON wordt gevalideerd voordat het wordt verzonden",
   "composer.send": "Verzoek verzenden",
   "composer.sending": "Verzoek wordt verzondenâ€¦",

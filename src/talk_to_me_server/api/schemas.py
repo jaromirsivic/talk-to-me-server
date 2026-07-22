@@ -14,6 +14,15 @@ class Importance(StrEnum):
     LOW = "low"
 
 
+class QueueInfoMode(StrEnum):
+    MIN = "min"
+    MAX = "max"
+
+
+class QueueInfoRequest(StrictModel):
+    mode: QueueInfoMode = QueueInfoMode.MAX
+
+
 class TextToSpeechRequest(StrictModel):
     value: str | None = Field(default=None, exclude=True)
     values: list[str] | None = None

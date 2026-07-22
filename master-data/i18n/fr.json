@@ -16,6 +16,7 @@
   "composer.reset": "Réinitialiser",
   "composer.maximize": "Maximiser l'éditeur de requêtes",
   "composer.restore": "Éditeur de demande de restauration",
+  "composer.stop": "Arrêter",
   "composer.status": "JSON est validé avant envoi",
   "composer.send": "Envoyer la demande",
   "composer.sending": "Envoi de la demande…",

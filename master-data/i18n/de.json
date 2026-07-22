@@ -16,6 +16,7 @@
   "composer.reset": "Zurücksetzen",
   "composer.maximize": "Maximieren Sie den Anforderungseditor",
   "composer.restore": "Editor für Wiederherstellungsanfragen",
+  "composer.stop": "Stopp",
   "composer.status": "JSON wird vor dem Senden validiert",
   "composer.send": "Anfrage senden",
   "composer.sending": "Anfrage wird gesendet...",

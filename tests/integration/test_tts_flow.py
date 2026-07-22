@@ -4,6 +4,8 @@ import threading
 
 import pytest
 
+from talk_to_me_server.tts.base import SynthesisResult
+
 
 @pytest.mark.parametrize("values", [None, []])
 def test_empty_values_is_a_successful_no_op(tts_client, values) -> None:
@@ -292,6 +294,84 @@ def test_stop_on_empty_queue_returns_standard_success_envelope(tts_client) -> No
         "reasonText": "Playback stopped",
         "cancelledJobs": 0,
     }
+
+
+def test_queue_info_defaults_to_max_and_validates_mode(tts_client) -> None:
+    missing_body = tts_client.post("/api/v1/queueInfo")
+    empty_body = tts_client.post("/api/v1/queueInfo", json={})
+    minimum = tts_client.post("/api/v1/queueInfo", json={"mode": "min"})
+    invalid = tts_client.post("/api/v1/queueInfo", json={"mode": "full"})
+
+    assert missing_body.status_code == 200
+    assert missing_body.json() == {
+        "version": 1,
+        "reasonCode": 200,
+        "reasonText": "OK",
+        "hasActiveJobs": False,
+        "activeJobCount": 0,
+        "jobs": [],
+    }
+    assert empty_body.json() == missing_body.json()
+    assert minimum.json() == {
+        "version": 1,
+        "reasonCode": 200,
+        "reasonText": "OK",
+        "hasActiveJobs": False,
+        "activeJobCount": 0,
+    }
+    assert invalid.status_code == invalid.json()["reasonCode"] == 400
+
+
+def test_queue_info_max_returns_active_job_progress(tts_client, tts_runtime) -> None:
+    import asyncio
+    import threading
+
+    started = threading.Event()
+    release = threading.Event()
+
+    class BlockingPool:
+        async def synthesize(self, command):
+            started.set()
+            await asyncio.to_thread(release.wait)
+            command.output_path.parent.mkdir(parents=True, exist_ok=True)
+            command.output_path.write_bytes(command.text.encode("utf-8"))
+            return SynthesisResult(
+                command.job_id,
+                command.index,
+                command.output_path,
+                process_id=1,
+                worker_index=0,
+            )
+
+    original_pool = tts_runtime.scheduler.pool
+    tts_runtime.scheduler.pool = BlockingPool()
+    try:
+        accepted = tts_client.post(
+            "/api/v1/textToSpeech", json={"values": ["first", "second"]}
+        )
+        assert accepted.status_code == 200
+        assert started.wait(timeout=2)
+
+        minimum = tts_client.post("/api/v1/queueInfo", json={"mode": "min"})
+        maximum = tts_client.post("/api/v1/queueInfo", json={"mode": "max"})
+
+        assert minimum.json()["hasActiveJobs"] is True
+        assert minimum.json()["activeJobCount"] == 1
+        assert "jobs" not in minimum.json()
+        body = maximum.json()
+        assert body["hasActiveJobs"] is True
+        assert body["activeJobCount"] == 1
+        assert [job["id"] for job in body["jobs"]] == [accepted.json()["jobId"]]
+        assert body["jobs"][0]["state"] == "processing"
+        assert [value["text"] for value in body["jobs"][0]["values"]] == [
+            "first",
+            "second",
+        ]
+        assert all("workerIndex" in value for value in body["jobs"][0]["values"])
+    finally:
+        tts_client.post("/api/v1/stop")
+        release.set()
+        tts_runtime.scheduler.pool = original_pool
 
 
 @pytest.mark.parametrize(
