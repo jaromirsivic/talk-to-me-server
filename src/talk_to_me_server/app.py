@@ -198,10 +198,6 @@ def create_app(runtime: Runtime | None = None) -> FastAPI:
     async def master_request() -> FileResponse:
         return FileResponse(project_root / "master-data" / "request.json")
 
-    @app.get("/master-data/benchmark-request.json", include_in_schema=False)
-    async def benchmark_request() -> FileResponse:
-        return FileResponse(project_root / "master-data" / "benchmark-request.json")
-
     @app.get("/master-data/i18n/{locale}.json", include_in_schema=False)
     async def portal_locale(locale: str) -> FileResponse:
         if locale not in PORTAL_LOCALES:

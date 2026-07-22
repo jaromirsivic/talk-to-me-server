@@ -157,3 +157,40 @@ async def test_wait_terminal_is_notified_and_release_removes_job(queue) -> None:
 
     await queue.release(job.id)
     assert queue.get(job.id) is None
+
+
+@pytest.mark.asyncio
+async def test_cancel_all_atomically_cancels_active_jobs_and_wakes_waiters(queue) -> None:
+    first = (await queue.enqueue(TextToSpeechRequest(values=["a"]), snapshot())).job
+    second = (await queue.enqueue(TextToSpeechRequest(values=["b"]), snapshot())).job
+    assert first is not None and second is not None
+    await queue.claim_for_synthesis(wait=False)
+    waiter = asyncio.create_task(queue.wait_terminal(first.id))
+    await asyncio.sleep(0)
+
+    cancelled = await queue.cancel_all()
+    terminal = await asyncio.wait_for(waiter, timeout=0.5)
+
+    assert {job.id for job in cancelled} == {first.id, second.id}
+    assert terminal.state is JobState.CANCELLED
+    assert terminal.errors[0].code == 409
+    assert terminal.errors[0].message == "Stopped by request"
+    assert all(value.state is ValueState.CANCELLED for job in cancelled for value in job.values)
+    assert queue.active_count == 0
+    assert await queue.claim_for_synthesis(wait=False) is None
+    assert await queue.claim_for_playback(wait=False) is None
+
+
+@pytest.mark.asyncio
+async def test_begin_stop_blocks_new_admission_until_stop_finishes(queue) -> None:
+    await queue.begin_stop()
+    admission = asyncio.create_task(
+        queue.enqueue(TextToSpeechRequest(values=["after"]), snapshot())
+    )
+    await asyncio.sleep(0)
+
+    assert not admission.done()
+
+    await queue.finish_stop()
+    result = await asyncio.wait_for(admission, timeout=0.5)
+    assert result.accepted

@@ -2,7 +2,7 @@ import {postApi} from "./api.js";
 import {appendChatCard, appendFirstMessageNotice} from "./chat.js";
 import {initializeCodeControls} from "./code-controls.js";
 import {parseJson, prettyJson} from "./json.js";
-import {initializeBaseDialogs} from "./modal.js";
+import {initializeBaseDialogs, openDialog} from "./modal.js";
 import {initializeI18n, translate} from "./i18n.js";
 import {initializeSettings} from "./settings.js";
 import {initializeTheme} from "./theme.js";
@@ -12,7 +12,8 @@ const editor = document.querySelector("#request-json");
 const editorView = document.querySelector(".composer-editor");
 const sendButton = document.querySelector("#send-request");
 const resetButton = document.querySelector("#reset-request");
-const benchmarkButton = document.querySelector("#benchmark-request");
+const resetDialog = document.querySelector("#reset-confirm-dialog");
+const confirmResetButton = document.querySelector("#confirm-reset");
 const composer = document.querySelector("#composer");
 const composerToggle = document.querySelector("#composer-size-toggle");
 const composerResizeHandle = document.querySelector(".composer-resize-handle");
@@ -22,8 +23,15 @@ const status = document.querySelector("#composer-status");
 const errorDialog = document.querySelector("#json-error-dialog");
 const errorMessage = document.querySelector("#json-error-message");
 let initialRequest = null;
-let initialRequestReady;
 let editorControls = null;
+
+const fallbackRequest = {
+  value: "If you here this voice then talk to me server works. You can play positive gong {{play('positive_gong.wav')}} or neutral gong {{play('neutral_gong.wav')}} or negative gong {{play('negative_gong.wav')}}. And make a pause {{pause(2000)}} in the middle of a text. {{pause(500)}} You can control the priority of text to speech conversion using the importance parameter. If importance is set to high, the text is added to the end of the queue and played when its turn comes. If importance is set to low, the text is played immediately if the queue is empty. If there is at least one text item waiting in the queue, it is not played at all. {{pause(500)}} You can adjust the text volume using the volume multiplier parameter. {{pause(500)}} Setting the calculate stats parameter to true runs the model’s performance tests. {{pause(500)}} And if you want to wait until the entire text has been played, set wait until playback finished to true. If wait until playback finished parameter is set to false, the server returns a response immediately.",
+  importance: "high",
+  volumeMultiplier: 0.95,
+  calculateStats: false,
+  waitUntilPlaybackFinished: false,
+};
 
 async function loadInitialRequest() {
   const response = await fetch("/master-data/request.json", {cache: "no-store"});
@@ -31,20 +39,6 @@ async function loadInitialRequest() {
   initialRequest = await response.json();
   editor.value = prettyJson(initialRequest);
   editorControls?.refresh();
-}
-
-async function loadBenchmarkRequest() {
-  await initialRequestReady;
-  try {
-    const response = await fetch("/assets/data/benchmark-request.json", {cache: "no-store"});
-    if (!response.ok) throw new Error("Unable to load the benchmark request");
-    editor.value = prettyJson(await response.json());
-    editorControls?.refresh();
-    editor.focus();
-    status.textContent = translate("composer.benchmarkLoaded");
-  } catch (_error) {
-    status.textContent = translate("composer.benchmarkError");
-  }
 }
 
 function showJsonError(error) {
@@ -173,15 +167,18 @@ editor.addEventListener("keydown", (event) => {
   if ((event.ctrlKey || event.metaKey) && event.key === "Enter") sendRequest();
 });
 resetButton.addEventListener("click", () => {
+  openDialog(resetDialog, "#cancel-reset");
+});
+confirmResetButton.addEventListener("click", () => {
   if (initialRequest) editor.value = prettyJson(initialRequest);
   editorControls?.refresh();
   editor.focus();
 });
-benchmarkButton.addEventListener("click", loadBenchmarkRequest);
 
-initialRequestReady = loadInitialRequest().catch((error) => {
+loadInitialRequest().catch((error) => {
   status.textContent = error.message;
-  editor.value = prettyJson({values: ["Hello from TalkToMe."], importance: "high"});
+  initialRequest = structuredClone(fallbackRequest);
+  editor.value = prettyJson(initialRequest);
   editorControls?.refresh();
 });
 await initializeI18n();

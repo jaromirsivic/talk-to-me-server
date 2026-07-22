@@ -32,6 +32,10 @@ class ValueNotPlayable(RuntimeError):
         self.index = index
 
 
+class JobCancelled(ValueNotPlayable):
+    pass
+
+
 @dataclass(frozen=True)
 class QueueSettingsSnapshot:
     engine: str
@@ -70,6 +74,8 @@ class QueueManager:
     ) -> None:
         self._condition = asyncio.Condition()
         self._jobs: OrderedDict[str, Job] = OrderedDict()
+        self._cancelled_ids: set[str] = set()
+        self._stopping = False
         self._max_jobs = max_jobs
         self._ids = id_generator
         self._wall_clock = wall_clock or (lambda: datetime.now().astimezone())
@@ -89,6 +95,7 @@ class QueueManager:
         self, request: TextToSpeechRequest, snapshot: QueueSettingsSnapshot
     ) -> Admission:
         async with self._condition:
+            await self._condition.wait_for(lambda: not self._stopping)
             if request.importance is Importance.LOW and self.active_count:
                 return Admission(False, 200, LOW_BUSY_REASON)
             if self.active_count >= self._max_jobs:
@@ -136,6 +143,8 @@ class QueueManager:
     async def mark_synthesis_finished(self, job_id: str) -> Job:
         async with self._condition:
             job = self._require(job_id)
+            if job.state is JobState.CANCELLED:
+                return job
             at = self._wall_clock()
             monotonic_ns = self._monotonic_clock()
             if job.state is JobState.PROCESSING:
@@ -187,6 +196,8 @@ class QueueManager:
     ) -> None:
         async with self._condition:
             job = self._require(job_id)
+            if job.state is JobState.CANCELLED:
+                return
             if not 0 <= worker_index < job.snapshot.workers:
                 raise ValueError("worker index is outside the job worker range")
             try:
@@ -219,6 +230,8 @@ class QueueManager:
                     ValueState.FINISHED,
                 }:
                     return value
+                if value.state is ValueState.CANCELLED or job.state is JobState.CANCELLED:
+                    raise JobCancelled(job_id, index)
                 if value.state is ValueState.FAILED or job.state is JobState.FAILED:
                     raise ValueNotPlayable(job_id, index)
                 await self._condition.wait()
@@ -240,6 +253,8 @@ class QueueManager:
                 value = job.values[index]
             except IndexError as error:
                 raise IndexError(f"unknown value index: {index}") from error
+            if job.state is JobState.CANCELLED or value.state is ValueState.CANCELLED:
+                return
             value.transition(
                 target,
                 at=self._wall_clock(),
@@ -284,6 +299,8 @@ class QueueManager:
     async def finish(self, job_id: str) -> Job:
         async with self._condition:
             job = self._require(job_id)
+            if job.state.is_terminal:
+                return job
             job.transition(
                 JobState.FINISHED,
                 at=self._wall_clock(),
@@ -295,6 +312,8 @@ class QueueManager:
     async def fail(self, job_id: str, error: JobError | None) -> Job:
         async with self._condition:
             job = self._require(job_id)
+            if job.state.is_terminal:
+                return job
             job.transition(
                 JobState.FAILED,
                 at=self._wall_clock(),
@@ -303,6 +322,52 @@ class QueueManager:
             )
             self._condition.notify_all()
             return job
+
+    async def cancel_all(self) -> tuple[Job, ...]:
+        async with self._condition:
+            cancelled = self._cancel_all_locked()
+            self._condition.notify_all()
+            return cancelled
+
+    async def begin_stop(self) -> tuple[Job, ...]:
+        async with self._condition:
+            await self._condition.wait_for(lambda: not self._stopping)
+            self._stopping = True
+            cancelled = self._cancel_all_locked()
+            self._condition.notify_all()
+            return cancelled
+
+    async def finish_stop(self) -> None:
+        async with self._condition:
+            self._stopping = False
+            self._condition.notify_all()
+
+    def _cancel_all_locked(self) -> tuple[Job, ...]:
+        at = self._wall_clock()
+        monotonic_ns = self._monotonic_clock()
+        cancelled = []
+        for job in self._jobs.values():
+            if job.state.is_terminal:
+                continue
+            for value in job.values:
+                if not value.state.is_terminal:
+                    value.transition(
+                        ValueState.CANCELLED,
+                        at=at,
+                        monotonic_ns=monotonic_ns,
+                    )
+            job.transition(
+                JobState.CANCELLED,
+                at=at,
+                monotonic_ns=monotonic_ns,
+                error=JobError(
+                    code=409,
+                    message="Stopped by request",
+                    component="playback",
+                ),
+            )
+            cancelled.append(job)
+        return tuple(cancelled)
 
     async def wait_terminal(self, job_id: str) -> Job:
         async with self._condition:
@@ -319,6 +384,8 @@ class QueueManager:
                 return
             if not job.state.is_terminal:
                 raise RuntimeError("cannot release a nonterminal job")
+            if job.state is JobState.CANCELLED:
+                self._cancelled_ids.add(job_id)
             del self._jobs[job_id]
             self._condition.notify_all()
 
@@ -326,4 +393,6 @@ class QueueManager:
         try:
             return self._jobs[job_id]
         except KeyError as error:
+            if job_id in self._cancelled_ids:
+                raise JobCancelled(job_id, -1) from error
             raise KeyError(f"unknown job: {job_id}") from error

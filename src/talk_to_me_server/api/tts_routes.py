@@ -14,6 +14,26 @@ from talk_to_me_server.domain.stats import calculate_stats
 router = APIRouter(prefix="/api/v1")
 
 
+@router.post("/stop")
+async def stop_playback(request: Request) -> JSONResponse:
+    runtime = request.app.state.runtime
+    if runtime.queue is None or runtime.archive is None or runtime.playback is None:
+        return envelope(503, "Text-to-speech runtime is unavailable")
+    cancelled = await runtime.queue.begin_stop()
+    try:
+        await runtime.playback.stop()
+        for job in cancelled:
+            runtime.archive.finalize(job)
+        for job in cancelled:
+            if not (job.request.calculate_stats or job.request.wait_until_playback_finished):
+                await runtime.queue.release(job.id)
+        return envelope(200, "Playback stopped", cancelledJobs=len(cancelled))
+    except OSError:
+        return envelope(507, "Archive is not writable")
+    finally:
+        await runtime.queue.finish_stop()
+
+
 @router.post("/textToSpeech")
 async def text_to_speech(
     request: Request, payload: TextToSpeechRequest

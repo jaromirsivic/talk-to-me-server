@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "Обробка першого повідомлення може тривати значно довше, ніж наступних, оскільки нейронна мережа завантажується в пам’ять.",
   "composer.request": "ЗАПИТ JSON",
   "composer.reset": "Скинути",
-  "composer.benchmark": "Еталон",
   "composer.maximize": "Розгорнути редактор запитів",
   "composer.restore": "Редактор запитів на відновлення",
-  "composer.benchmarkLoaded": "Запит на порівняльний аналіз завантажено",
-  "composer.benchmarkError": "Неможливо завантажити запит на порівняльний тест",
   "composer.status": "JSON перевіряється перед надсиланням",
   "composer.send": "Надіслати запит",
   "composer.sending": "Надсилання запиту...",
@@ -62,7 +59,7 @@
   "voice.confirmationRequired": "потрібне підтвердження ліцензії",
   "voice.custom": "Власний",
   "voice.import": "Імпорт власного голосу",
-  "voice.customName": "Власне голосове ім\u0027я",
+  "voice.customName": "Власне голосове ім'я",
   "voice.license": "Ліцензія на голос",
   "voice.modelFile": "Файл моделі Piper",
   "voice.configFile": "Файл конфігурації Piper",
@@ -97,5 +94,7 @@
   "network.title": "Налаштування мережі",
   "network.remoteManagement": "Увімкнути віддалене керування",
   "network.remoteWarning": "Віддалене керування надає контроль налаштування вашій локальній мережі.",
-  "general.title": "Загальне налаштування"
+  "general.title": "Загальне налаштування",
+  "dialog.resetMessage": "Ви справді хочете скинути текст на панелі?",
+  "dialog.confirmReset": "Скинути текст"
 }

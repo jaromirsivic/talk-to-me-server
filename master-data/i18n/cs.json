@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "Zpracování první zprávy může trvat výrazně déle než zpracování následujících zpráv, protože se neuronová síť načítá do paměti.",
   "composer.request": "JSON POŽADAVKU",
   "composer.reset": "Resetovat",
-  "composer.benchmark": "Benchmark",
   "composer.maximize": "Maximalizovat editor požadavku",
   "composer.restore": "Obnovit velikost editoru požadavku",
-  "composer.benchmarkLoaded": "Benchmarkový požadavek načten",
-  "composer.benchmarkError": "Benchmarkový požadavek se nepodařilo načíst",
   "composer.status": "JSON se před odesláním ověří",
   "composer.send": "Odeslat požadavek",
   "composer.sending": "Odesílání požadavku…",
@@ -97,5 +94,7 @@
   "network.title": "Nastavení sítě",
   "network.remoteManagement": "Povolit vzdálenou správu",
   "network.remoteWarning": "Vzdálená správa zpřístupní ovládací prvky nastavení ve vaší síti LAN.",
-  "general.title": "Obecné nastavení"
+  "general.title": "Obecné nastavení",
+  "dialog.resetMessage": "Opravdu chcete text v panelu resetovat?",
+  "dialog.confirmReset": "Resetovat text"
 }

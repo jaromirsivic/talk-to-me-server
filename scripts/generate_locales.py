@@ -21,11 +21,8 @@ BASE = {
     "chat.readyBody": "Edit the JSON request below. Requests and responses stay visible only until this page is reloaded.",
     "composer.request": "REQUEST JSON",
     "composer.reset": "Reset",
-    "composer.benchmark": "Benchmark",
     "composer.maximize": "Maximize request editor",
     "composer.restore": "Restore request editor",
-    "composer.benchmarkLoaded": "Benchmark request loaded",
-    "composer.benchmarkError": "Unable to load the benchmark request",
     "composer.status": "JSON is validated before sending",
     "composer.send": "Send request",
     "composer.sending": "Sending request…",
@@ -41,6 +38,8 @@ BASE = {
     "dialog.cancel": "Cancel",
     "dialog.save": "Save settings",
     "dialog.return": "Return to editor",
+    "dialog.resetMessage": "Do you really want to reset the text in the panel?",
+    "dialog.confirmReset": "Reset text",
     "language.search": "Search languages",
     "language.noResults": "No languages found",
     "chat.request": "request",
@@ -171,7 +170,13 @@ def main() -> None:
         translated_values = values[:5] + values[6:]
         translated = BASE | dict(zip(keys, translated_values, strict=True))
         translated.update(LOCALE_OVERRIDES.get(code, {}))
-        (output / f"{code}.json").write_text(
+        existing_path = output / f"{code}.json"
+        if existing_path.is_file():
+            existing = json.loads(existing_path.read_text(encoding="utf-8"))
+            for key in ("dialog.resetMessage", "dialog.confirmReset"):
+                if key in existing:
+                    translated[key] = existing[key]
+        existing_path.write_text(
             json.dumps(translated, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
 

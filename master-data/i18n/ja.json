@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "ニューラルネットワークをメモリに読み込むため、最初のメッセージの処理には2回目以降より大幅に時間がかかる場合があります。",
   "composer.request": "リクエスト JSON",
   "composer.reset": "リセット",
-  "composer.benchmark": "ベンチマーク",
   "composer.maximize": "リクエストエディターを最大化する",
   "composer.restore": "復元リクエストエディター",
-  "composer.benchmarkLoaded": "ベンチマークリクエストがロードされました",
-  "composer.benchmarkError": "ベンチマークリクエストをロードできません",
   "composer.status": "JSON は送信前に検証されます",
   "composer.send": "リクエストの送信",
   "composer.sending": "リクエストを送信中...",
@@ -97,5 +94,7 @@
   "network.title": "ネットワークのセットアップ",
   "network.remoteManagement": "リモート管理を有効にする",
   "network.remoteWarning": "リモート管理により、セットアップ コントロールが LAN に公開されます。",
-  "general.title": "一般的なセットアップ"
+  "general.title": "一般的なセットアップ",
+  "dialog.resetMessage": "パネルのテキストを本当にリセットしますか？",
+  "dialog.confirmReset": "テキストをリセット"
 }

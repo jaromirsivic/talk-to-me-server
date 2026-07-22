@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "Обработката на първото съобщение може да отнеме значително повече време от следващите, защото невронната мрежа се зарежда в паметта.",
   "composer.request": "JSON ЗАЯВКА",
   "composer.reset": "Нулиране",
-  "composer.benchmark": "Бенчмарк",
   "composer.maximize": "Увеличете редактора на заявки",
   "composer.restore": "Редактор на заявка за възстановяване",
-  "composer.benchmarkLoaded": "Заявката за сравнителен анализ е заредена",
-  "composer.benchmarkError": "Заявката за сравнителен анализ не може да се зареди",
   "composer.status": "JSON се проверява преди изпращане",
   "composer.send": "Изпратете заявка",
   "composer.sending": "Изпращане на заявка...",
@@ -97,5 +94,7 @@
   "network.title": "Настройка на мрежата",
   "network.remoteManagement": "Активиране на дистанционно управление",
   "network.remoteWarning": "Дистанционното управление излага контролите за настройка на вашата LAN.",
-  "general.title": "Обща настройка"
+  "general.title": "Обща настройка",
+  "dialog.resetMessage": "Наистина ли искате да нулирате текста в панела?",
+  "dialog.confirmReset": "Нулиране на текста"
 }

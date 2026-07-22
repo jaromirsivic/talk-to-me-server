@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "Обработка первого сообщения может занять значительно больше времени, чем последующих, поскольку нейронная сеть загружается в память.",
   "composer.request": "JSON-ЗАПРОС",
   "composer.reset": "Сброс",
-  "composer.benchmark": "Контрольный показатель",
   "composer.maximize": "Развернуть редактор запросов",
   "composer.restore": "Редактор запросов на восстановление",
-  "composer.benchmarkLoaded": "Запрос на тестирование загружен.",
-  "composer.benchmarkError": "Невозможно загрузить запрос теста производительности",
   "composer.status": "JSON проверяется перед отправкой",
   "composer.send": "Отправить запрос",
   "composer.sending": "Отправка запроса…",
@@ -97,5 +94,7 @@
   "network.title": "Настройка сети",
   "network.remoteManagement": "Включить удаленное управление",
   "network.remoteWarning": "Удаленное управление предоставляет элементы управления настройкой в вашей локальной сети.",
-  "general.title": "Общая настройка"
+  "general.title": "Общая настройка",
+  "dialog.resetMessage": "Вы действительно хотите сбросить текст на панели?",
+  "dialog.confirmReset": "Сбросить текст"
 }

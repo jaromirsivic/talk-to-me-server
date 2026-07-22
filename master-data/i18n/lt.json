@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "Pirmosios žinutės apdorojimas gali užtrukti gerokai ilgiau nei kitų žinučių, nes neuroninis tinklas įkeliamas į atmintį.",
   "composer.request": "JSON UŽKLAUSA",
   "composer.reset": "Nustatyti iš naujo",
-  "composer.benchmark": "Etalonas",
   "composer.maximize": "Maksimalus užklausų redaktorius",
   "composer.restore": "Atkurti užklausų rengyklę",
-  "composer.benchmarkLoaded": "Palyginimo užklausa įkelta",
-  "composer.benchmarkError": "Nepavyko įkelti palyginimo užklausos",
   "composer.status": "JSON patvirtinamas prieš siunčiant",
   "composer.send": "Siųsti prašymą",
   "composer.sending": "Prašymo siuntimas",
@@ -97,5 +94,7 @@
   "network.title": "Tinklo sąranka",
   "network.remoteManagement": "Įgalinti nuotolinį valdymą",
   "network.remoteWarning": "Nuotolinis valdymas atskleidžia sąrankos valdiklius jūsų LAN.",
-  "general.title": "Bendroji sąranka"
+  "general.title": "Bendroji sąranka",
+  "dialog.resetMessage": "Ar tikrai norite iš naujo nustatyti tekstą skydelyje?",
+  "dialog.confirmReset": "Iš naujo nustatyti tekstą"
 }

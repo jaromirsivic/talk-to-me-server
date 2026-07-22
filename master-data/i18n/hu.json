@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "Az első üzenet feldolgozása lényegesen tovább tarthat, mint a következő üzeneteké, mert a neurális hálózat ekkor töltődik be a memóriába.",
   "composer.request": "JSON-KÉRÉS",
   "composer.reset": "Visszaállítás",
-  "composer.benchmark": "Benchmark",
   "composer.maximize": "Maximális kérésszerkesztő",
   "composer.restore": "Kérelemszerkesztő visszaállítása",
-  "composer.benchmarkLoaded": "Összehasonlító kérés betöltve",
-  "composer.benchmarkError": "Nem sikerült betölteni az összehasonlítási kérést",
   "composer.status": "A JSON ellenőrzésre kerül a küldés előtt",
   "composer.send": "Kérelem küldése",
   "composer.sending": "Kérelem küldése",
@@ -97,5 +94,7 @@
   "network.title": "Hálózat beállítása",
   "network.remoteManagement": "Távkezelés engedélyezése",
   "network.remoteWarning": "A távfelügyelet a beállítási vezérlőket teszi elérhetővé a LAN számára.",
-  "general.title": "Általános beállítás"
+  "general.title": "Általános beállítás",
+  "dialog.resetMessage": "Biztosan visszaállítja a panel szövegét?",
+  "dialog.confirmReset": "Szöveg visszaállítása"
 }

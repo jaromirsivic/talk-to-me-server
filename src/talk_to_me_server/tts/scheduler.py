@@ -5,7 +5,7 @@ from concurrent.futures.process import BrokenProcessPool
 from pathlib import Path
 
 from talk_to_me_server.domain.jobs import Job, JobError
-from talk_to_me_server.domain.queue import QueueManager
+from talk_to_me_server.domain.queue import JobCancelled, QueueManager
 from talk_to_me_server.storage.archive import JobArchive
 from talk_to_me_server.tts.base import SynthesisCommand, SynthesisPool
 from talk_to_me_server.tts.pauses import PauseCommand, silence_wav
@@ -50,6 +50,8 @@ class SynthesisScheduler:
             return_exceptions=True,
         )
         failure = next((result for result in results if isinstance(result, BaseException)), None)
+        if isinstance(failure, JobCancelled):
+            return
         if failure is not None:
             current = await self.queue.mark_synthesis_failed(job.id)
             if current.state.is_terminal:
@@ -89,7 +91,10 @@ class SynthesisScheduler:
                     job.id, index, result.worker_index
                 )
             else:
-                await self._materialize_sound(job.id, index, play)
+                try:
+                    await self._materialize_sound(job.id, index, play)
+                except SoundNotFoundError:
+                    await self._materialize_pause(job.id, index, 0)
         except BaseException as error:
             if isinstance(error, asyncio.CancelledError):
                 raise

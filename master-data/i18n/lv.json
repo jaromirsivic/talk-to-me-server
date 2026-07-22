@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "Pirmā ziņojuma apstrāde var aizņemt ievērojami ilgāku laiku nekā nākamo ziņojumu apstrāde, jo neironu tīkls tiek ielādēts atmiņā.",
   "composer.request": "JSON PIEPRASĪJUMS",
   "composer.reset": "Atiestatīt",
-  "composer.benchmark": "Etalons",
   "composer.maximize": "Maksimizēt pieprasījuma redaktoru",
   "composer.restore": "Atjaunot pieprasījumu redaktoru",
-  "composer.benchmarkLoaded": "Etalona pieprasījums ir ielādēts",
-  "composer.benchmarkError": "Nevar ielādēt etalona pieprasījumu",
   "composer.status": "Pirms nosūtīšanas JSON tiek pārbaudīts",
   "composer.send": "Nosūtīt pieprasījumu",
   "composer.sending": "Pieprasījuma nosūtīšana",
@@ -97,5 +94,7 @@
   "network.title": "Tīkla iestatīšana",
   "network.remoteManagement": "Iespējot attālo pārvaldību",
   "network.remoteWarning": "Attālā pārvaldība pakļauj iestatīšanas vadīklas jūsu LAN.",
-  "general.title": "Vispārējā iestatīšana"
+  "general.title": "Vispārējā iestatīšana",
+  "dialog.resetMessage": "Vai tiešām vēlaties atiestatīt tekstu panelī?",
+  "dialog.confirmReset": "Atiestatīt tekstu"
 }

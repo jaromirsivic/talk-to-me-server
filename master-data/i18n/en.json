@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "The first message can take significantly longer to process than subsequent messages because the neural network is being loaded into memory.",
   "composer.request": "REQUEST JSON",
   "composer.reset": "Reset",
-  "composer.benchmark": "Benchmark",
   "composer.maximize": "Maximize request editor",
   "composer.restore": "Restore request editor",
-  "composer.benchmarkLoaded": "Benchmark request loaded",
-  "composer.benchmarkError": "Unable to load the benchmark request",
   "composer.status": "JSON is validated before sending",
   "composer.send": "Send request",
   "composer.sending": "Sending request…",
@@ -97,5 +94,7 @@
   "network.title": "Network Setup",
   "network.remoteManagement": "Enable remote management",
   "network.remoteWarning": "Remote management exposes setup controls to your LAN.",
-  "general.title": "General Setup"
+  "general.title": "General Setup",
+  "dialog.resetMessage": "Do you really want to reset the text in the panel?",
+  "dialog.confirmReset": "Reset text"
 }

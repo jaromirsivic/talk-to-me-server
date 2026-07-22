@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "Die Verarbeitung der ersten Nachricht kann deutlich länger dauern als die der folgenden Nachrichten, da das neuronale Netz in den Arbeitsspeicher geladen wird.",
   "composer.request": "JSON-ANFRAGE",
   "composer.reset": "Zurücksetzen",
-  "composer.benchmark": "Benchmark",
   "composer.maximize": "Maximieren Sie den Anforderungseditor",
   "composer.restore": "Editor für Wiederherstellungsanfragen",
-  "composer.benchmarkLoaded": "Benchmark-Anfrage geladen",
-  "composer.benchmarkError": "Die Benchmark-Anfrage konnte nicht geladen werden",
   "composer.status": "JSON wird vor dem Senden validiert",
   "composer.send": "Anfrage senden",
   "composer.sending": "Anfrage wird gesendet...",
@@ -97,5 +94,7 @@
   "network.title": "Netzwerk-Setup",
   "network.remoteManagement": "Aktivieren Sie die Fernverwaltung",
   "network.remoteWarning": "Durch die Fernverwaltung werden Einrichtungskontrollen für Ihr LAN verfügbar gemacht.",
-  "general.title": "Allgemeine Einrichtung"
+  "general.title": "Allgemeine Einrichtung",
+  "dialog.resetMessage": "Möchten Sie den Text im Bedienfeld wirklich zurücksetzen?",
+  "dialog.confirmReset": "Text zurücksetzen"
 }

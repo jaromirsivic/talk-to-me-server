@@ -13,7 +13,7 @@ def test_chat_shows_indented_request_and_response(
     page.set_viewport_size(viewport)
     page.goto(live_server.url)
     editor = page.get_by_label("Request JSON")
-    expect(editor).to_have_value(re.compile("Hello from TalkToMe Server"))
+    expect(editor).to_have_value(re.compile("If you here this voice"))
     editor.fill(json.dumps({"values": ["Hello"], "importance": "high", "calculateStats": True}))
     page.get_by_role("button", name="Send request").click()
     expect(page.locator('[data-kind="response"]')).to_have_count(1)
@@ -61,20 +61,27 @@ def test_editor_starts_from_master_request_and_reports_json_location(
     expect(page.locator(".chat-card")).to_have_count(0)
 
 
-def test_benchmark_populates_editor_without_sending(page: Page, live_server) -> None:
-    page.route(
-        "**/master-data/benchmark-request.json",
-        lambda route: route.fulfill(status=404, body="missing backend route"),
-    )
+def test_reset_requires_confirmation_and_restores_default_request(
+    page: Page, live_server
+) -> None:
     page.goto(live_server.url)
-    page.get_by_role("button", name="Benchmark").click()
-
     editor = page.get_by_label("Request JSON")
-    expect(editor).to_have_value(re.compile("Lorem ipsum"))
+    editor.fill('{"values":["custom"]}')
+    page.get_by_role("button", name="Reset").click()
+
+    dialog = page.get_by_role("dialog", name="Reset")
+    expect(dialog).to_contain_text("Do you really want to reset the text in the panel?")
+    expect(page.locator("#cancel-reset")).to_be_focused()
+    dialog.get_by_role("button", name="Cancel").click()
+    expect(editor).to_have_value('{"values":["custom"]}')
+
+    page.get_by_role("button", name="Reset").click()
+    dialog.get_by_role("button", name="Reset text").click()
     payload = json.loads(editor.input_value())
-    assert len(payload["values"]) == 32
+    assert payload["value"].startswith("If you here this voice")
     assert payload["importance"] == "high"
-    assert payload["calculateStats"] is True
+    assert payload["volumeMultiplier"] == 0.95
+    assert payload["calculateStats"] is False
     expect(page.locator(".chat-card")).to_have_count(0)
 
 

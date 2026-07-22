@@ -12,7 +12,9 @@ def test_portal_has_semantic_shell_and_accessible_json_composer() -> None:
     assert 'aria-live="polite"' in html
     assert "Conversation</h1>" not in html
     assert 'data-i18n-aria-label="chat.region"' in html
-    assert 'id="benchmark-request"' in html
+    assert 'id="benchmark-request"' not in html
+    assert 'id="reset-confirm-dialog"' in html
+    assert 'src="/js/app.js?v=sprint-0002"' in html
 
 
 def test_first_message_notice_is_inserted_before_the_first_request() -> None:
@@ -31,19 +33,18 @@ def test_first_message_notice_is_inserted_before_the_first_request() -> None:
     assert "align-self: center" in css
 
 
-def test_benchmark_request_is_valid_and_allowlisted() -> None:
-    payload = json.loads(Path("master-data/benchmark-request.json").read_text(encoding="utf-8"))
-    portal_payload = json.loads(
-        Path("web/assets/data/benchmark-request.json").read_text(encoding="utf-8")
-    )
+def test_default_request_is_valid_and_benchmark_is_fully_removed() -> None:
+    payload = json.loads(Path("master-data/request.json").read_text(encoding="utf-8"))
     app = Path("src/talk_to_me_server/app.py").read_text(encoding="utf-8")
+    browser = Path("web/js/app.js").read_text(encoding="utf-8")
 
-    assert len(payload["values"]) == 32
+    assert payload["value"].startswith("If you here this voice")
     assert payload["importance"] == "high"
-    assert payload["calculateStats"] is True
-    assert "severity" not in payload
-    assert portal_payload == payload
-    assert '@app.get("/master-data/benchmark-request.json", include_in_schema=False)' in app
+    assert payload["volumeMultiplier"] == 0.95
+    assert payload["calculateStats"] is False
+    assert payload["waitUntilPlaybackFinished"] is False
+    assert "benchmark" not in app.casefold()
+    assert "benchmark" not in browser.casefold()
 
 
 def test_every_api_call_uses_post_and_json_is_pretty_printed() -> None:
@@ -102,7 +103,8 @@ def test_composer_code_controls_use_project_icons_in_the_requested_order() -> No
     toolbar_end = html.index("</div>", toolbar_start)
     toolbar = html[toolbar_start:toolbar_end]
 
-    assert toolbar.index('id="benchmark-request"') < toolbar.index('id="copy-request"')
+    assert 'id="benchmark-request"' not in toolbar
+    assert toolbar.index('id="reset-request"') < toolbar.index('id="copy-request"')
     assert toolbar.index('id="copy-request"') < toolbar.index('id="wrap-request"')
     assert toolbar.index('id="wrap-request"') < toolbar.index('id="line-numbers-request"')
     assert toolbar.index('id="line-numbers-request"') < toolbar.index(

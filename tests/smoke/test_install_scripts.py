@@ -49,54 +49,64 @@ def test_install_batch_delegates_to_install_script_and_preserves_exit_code() -> 
 
 def test_start_batch_launches_one_tracked_server_process() -> None:
     text = Path("start-server.bat").read_text(encoding="utf-8").lower()
+    control = Path("server-control.ps1").read_text(encoding="utf-8").lower()
 
-    assert "run.ps1" in text
-    assert "server.pid" in text
-    assert "start-process" in text
-    assert "-passthru" in text
-    assert "get-ciminstance" in text
+    assert "server-control.ps1" in text
+    assert "-action start" in text
+    assert "run.ps1" in control
+    assert "server.pid" in control
+    assert "start-process" in control
+    assert "-passthru" in control
+    assert "get-ciminstance" in control
 
 
 def test_start_batch_waits_for_listener_and_prints_browser_url_last() -> None:
-    text = Path("start-server.bat").read_text(encoding="utf-8")
+    text = Path("server-control.ps1").read_text(encoding="utf-8")
 
     assert "Get-NetTCPConnection" in text
+    assert "Test-ListenerBelongsToRoot" in text
+    assert "configured port is owned by another process" in text
     assert "RedirectStandardError" in text
     assert "Set-Content -LiteralPath $pidFile" not in text
     assert "$network.ipv4Address" in text
     assert "$network.port" in text
     message = "Portal URL: "
     assert message in text
-    assert text.rindex("& $writeLocation") > text.index("TalkToMe server started.")
+    assert text.rindex("Write-Location") > text.index("TalkToMe server started.")
     assert "PID: " in text
     assert "Port: " in text
     assert "Listening addresses: " in text
-    assert "timeout /t 5 /nobreak" in text.lower()
+    wrapper = Path("start-server.bat").read_text(encoding="utf-8").lower()
+    assert "timeout /t 5 /nobreak" in wrapper
 
 
 def test_stop_batch_validates_and_stops_only_the_tracked_process_tree() -> None:
     text = Path("stop-server.bat").read_text(encoding="utf-8").lower()
+    control = Path("server-control.ps1").read_text(encoding="utf-8").lower()
 
-    assert "server.pid" in text
-    assert "get-ciminstance" in text
-    assert "commandline" in text
-    assert "taskkill.exe" in text
-    assert any(quoted in text for quoted in ('"/t"', "'/t'"))
-    assert any(quoted in text for quoted in ('"/f"', "'/f'"))
+    assert "server-control.ps1" in text
+    assert "-action stop" in text
+    assert "server.pid" in control
+    assert "get-ciminstance" in control
+    assert "commandline" in control
+    assert "taskkill.exe" in control
+    assert any(quoted in control for quoted in ('"/t"', "'/t'"))
+    assert any(quoted in control for quoted in ('"/f"', "'/f'"))
 
 
 def test_stop_batch_finds_a_legacy_project_server_when_pid_file_is_missing() -> None:
-    text = Path("stop-server.bat").read_text(encoding="utf-8").lower()
+    text = Path("server-control.ps1").read_text(encoding="utf-8").lower()
 
     assert "if (-not (test-path -literalpath $pidfile)) { write-host 'talktome server is not running.'; exit 0 }" not in text
     assert ".venv" in text
     assert "-m talk_to_me_server" in text
     assert "executablepath" in text
     assert "parentprocessid" in text
+    assert "get-projectcontrolroot" in text
 
 
 def test_stop_batch_always_reports_configured_port_owner() -> None:
-    text = Path("stop-server.bat").read_text(encoding="utf-8").lower()
+    text = Path("server-control.ps1").read_text(encoding="utf-8").lower()
 
     assert "data\\setup.json" in text
     assert "master-data\\setup.json" in text
@@ -146,6 +156,9 @@ def test_unix_start_script_tracks_and_validates_the_server() -> None:
     assert 'ps -p "$server_pid" -o command=' in text
     assert 'Portal URL: ' in text
     assert 'socket.create_connection' in text
+    assert 'listener_belongs_to_server' in text
+    assert 'listener_pids' in text
+    assert 'configured port is owned by another process' in text
 
 
 def test_unix_stop_script_only_stops_the_validated_server() -> None:
@@ -156,3 +169,4 @@ def test_unix_stop_script_only_stops_the_validated_server() -> None:
     assert 'Refusing to stop it' in text
     assert 'kill -TERM "$server_pid"' in text
     assert 'kill -KILL "$server_pid"' in text
+    assert 'listener_belongs_to_server' in text

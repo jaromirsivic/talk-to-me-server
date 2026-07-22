@@ -1,4 +1,6 @@
 import json
+from concurrent.futures import ThreadPoolExecutor
+import threading
 
 import pytest
 
@@ -118,6 +120,30 @@ def test_standalone_play_commands_play_assets_without_synthesis(
     values = response.json()["job"]["values"]
     assert [value["workerIndex"] for value in values] == [
         0, None, None, None, 0, 0, 0, 0
+    ]
+
+
+def test_missing_standalone_sound_is_skipped_and_later_values_play(
+    tts_client, tts_runtime
+) -> None:
+    response = tts_client.post(
+        "/api/v1/textToSpeech",
+        json={
+            "values": [
+                "before",
+                "{{play('missing.wav')}}",
+                "after",
+            ],
+            "waitUntilPlaybackFinished": True,
+        },
+    )
+
+    assert response.status_code == 200
+    assert tts_runtime.playback.player.played == ["before", "after"]
+    assert [value["state"] for value in response.json()["job"]["values"]] == [
+        "finished",
+        "finished",
+        "finished",
     ]
 
 
@@ -254,3 +280,87 @@ def test_missing_values_is_400_but_shape_overflow_is_413(tts_client) -> None:
     assert values_as_string.status_code == values_as_string.json()["reasonCode"] == 400
     assert both.status_code == both.json()["reasonCode"] == 400
     assert split_overflow.status_code == split_overflow.json()["reasonCode"] == 413
+
+
+def test_stop_on_empty_queue_returns_standard_success_envelope(tts_client) -> None:
+    response = tts_client.post("/api/v1/stop")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "version": 1,
+        "reasonCode": 200,
+        "reasonText": "Playback stopped",
+        "cancelledJobs": 0,
+    }
+
+
+@pytest.mark.parametrize(
+    "waiting_options",
+    [
+        {"waitUntilPlaybackFinished": True},
+        {"calculateStats": True},
+    ],
+    ids=["wait-until-finished", "calculate-stats"],
+)
+def test_stop_cancels_active_waiter_clears_queue_and_allows_next_request(
+    tts_client, tts_runtime, waiting_options
+) -> None:
+    original_player = tts_runtime.playback.player
+    started = threading.Event()
+
+    class BlockingPlayer:
+        def __init__(self) -> None:
+            self.stop_event = None
+            self.done_event = None
+
+        async def play(self, values, _volume, on_started, on_finished) -> None:
+            import asyncio
+
+            self.stop_event = asyncio.Event()
+            self.done_event = asyncio.Event()
+            try:
+                async for value in values:
+                    await on_started(value.index)
+                    started.set()
+                    await self.stop_event.wait()
+                    return
+            finally:
+                self.done_event.set()
+
+        async def stop(self) -> None:
+            if self.stop_event is None or self.done_event is None:
+                return
+            self.stop_event.set()
+            await self.done_event.wait()
+
+    tts_runtime.playback.player = BlockingPlayer()
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        waiting = executor.submit(
+            tts_client.post,
+            "/api/v1/textToSpeech",
+            json={"values": ["long"], **waiting_options},
+        )
+        assert started.wait(timeout=2)
+        stopped = tts_client.post("/api/v1/stop")
+        cancelled = waiting.result(timeout=2)
+
+    assert stopped.status_code == 200
+    assert stopped.json()["cancelledJobs"] == 1
+    assert cancelled.status_code == 409
+    assert cancelled.json()["reasonText"] == "Stopped by request"
+    assert cancelled.json()["job"]["state"] == "cancelled"
+    assert all(
+        value["state"] == "cancelled"
+        for value in cancelled.json()["job"]["values"]
+    )
+    if waiting_options.get("calculateStats"):
+        assert cancelled.json()["stats"]["errors"][0]["code"] == 409
+    assert tts_runtime.queue.active_count == 0
+
+    tts_runtime.playback.player = original_player
+    next_response = tts_client.post(
+        "/api/v1/textToSpeech",
+        json={"values": ["after stop"], "waitUntilPlaybackFinished": True},
+    )
+    assert next_response.status_code == 200
+    assert next_response.json()["job"]["state"] == "finished"

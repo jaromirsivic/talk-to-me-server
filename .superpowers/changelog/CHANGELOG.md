@@ -42,3 +42,13 @@
 - Nainstalované hlasy se řadí před hlasy dostupné ke stažení, takže tlačítka pro smazání jsou viditelná ihned po otevření dialogu.
 - Dialog výběru hlasu a nové ovládací prvky jsou přeložené do všech podporovaných jazyků a respektují pravidla přístupnosti.
 - Byly doplněny kontraktní, lokalizační, E2E a mobilní testy.
+
+## Zastavení přehrávání, reset portálu a spolehlivé řízení serveru
+
+- Chybějící soubor z příkazu `play` se přeskočí a zpracování pokračuje další položkou požadavku.
+- Endpoint `POST /api/v1/stop` zastaví aktivní zvuk, zruší frontu, probudí čekající klienty odpovědí 409 a umožní další přehrávání bez restartu.
+- Reset webového editoru vyžaduje lokalizované potvrzení a obnoví schválený výchozí JSON.
+- Tlačítko Benchmark, jeho data, endpoint, lokalizace a navázaná logika byly odstraněny.
+- Hlavní webový modul používá verzovanou URL, aby prohlížeč po aktualizaci nenačetl starou logiku z cache.
+- Windows, Linux a macOS řídicí skripty ověřují, že naslouchající PID patří do procesního stromu daného projektu, a odmítnou falešně úspěšný start na portu vlastněném jiným procesem.
+- Byly doplněny jednotkové, integrační, smoke a E2E testy nového chování.

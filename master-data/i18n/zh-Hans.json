@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "处理第一条消息可能比后续消息耗时长得多，因为神经网络正在加载到内存中。",
   "composer.request": "JSON 请求",
   "composer.reset": "重置",
-  "composer.benchmark": "基准测试",
   "composer.maximize": "最大化请求编辑器",
   "composer.restore": "恢复请求编辑器",
-  "composer.benchmarkLoaded": "已加载基准请求",
-  "composer.benchmarkError": "无法加载基准请求",
   "composer.status": "JSON 在发送前进行验证",
   "composer.send": "发送请求",
   "composer.sending": "正在发送请求……",
@@ -97,5 +94,7 @@
   "network.title": "网络设置",
   "network.remoteManagement": "启用远程管理",
   "network.remoteWarning": "远程管理将设置控制公开给您的 LAN。",
-  "general.title": "常规设置"
+  "general.title": "常规设置",
+  "dialog.resetMessage": "确实要重置面板中的文本吗？",
+  "dialog.confirmReset": "重置文本"
 }

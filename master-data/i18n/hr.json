@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "Obrada prve poruke može trajati znatno dulje od obrade sljedećih poruka jer se neuronska mreža učitava u memoriju.",
   "composer.request": "JSON ZAHTJEV",
   "composer.reset": "Resetiraj",
-  "composer.benchmark": "Benchmark",
   "composer.maximize": "Uređivač maksimalnih zahtjeva",
   "composer.restore": "Uređivač zahtjeva za vraćanje",
-  "composer.benchmarkLoaded": "Zahtjev za benchmark je učitan",
-  "composer.benchmarkError": "Nije moguće učitati zahtjev za benchmark",
   "composer.status": "JSON se provjerava prije slanja",
   "composer.send": "Pošalji zahtjev",
   "composer.sending": "Slanje zahtjeva...",
@@ -97,5 +94,7 @@
   "network.title": "Postavljanje mreže",
   "network.remoteManagement": "Omogući daljinsko upravljanje",
   "network.remoteWarning": "Daljinsko upravljanje izlaže kontrole postavljanja vašem LAN-u.",
-  "general.title": "Opće postavke"
+  "general.title": "Opće postavke",
+  "dialog.resetMessage": "Želite li zaista poništiti tekst na ploči?",
+  "dialog.confirmReset": "Poništi tekst"
 }

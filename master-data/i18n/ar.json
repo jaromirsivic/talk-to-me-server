@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "قد تستغرق معالجة الرسالة الأولى وقتًا أطول بكثير من الرسائل اللاحقة، لأن الشبكة العصبية تُحمَّل إلى الذاكرة.",
   "composer.request": "طلب JSON",
   "composer.reset": "إعادة تعيين",
-  "composer.benchmark": "المعيار",
   "composer.maximize": "تعظيم محرر الطلب",
   "composer.restore": "استعادة محرر الطلب",
-  "composer.benchmarkLoaded": "تم تحميل طلب المعيار",
-  "composer.benchmarkError": "غير قادر على تحميل طلب قياس الأداء",
   "composer.status": "يتم التحقق من صحة JSON قبل الإرسال",
   "composer.send": "إرسال الطلب",
   "composer.sending": "إرسال الطلب…",
@@ -97,5 +94,7 @@
   "network.title": "إعداد الشبكة",
   "network.remoteManagement": "تمكين الإدارة عن بعد",
   "network.remoteWarning": "تعرض الإدارة عن بعد عناصر التحكم في الإعداد لشبكة LAN الخاصة بك.",
-  "general.title": "الإعداد العام"
+  "general.title": "الإعداد العام",
+  "dialog.resetMessage": "هل تريد حقًا إعادة تعيين النص في اللوحة؟",
+  "dialog.confirmReset": "إعادة تعيين النص"
 }

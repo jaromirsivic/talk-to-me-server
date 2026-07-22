@@ -122,6 +122,8 @@ class WindowsAudioPlayer:
             raise ValueError("max_buffered_values must be at least one")
         self._sounddevice = sounddevice_module
         self._max_buffered_values = max_buffered_values
+        self._active_stop: asyncio.Event | None = None
+        self._active_done: asyncio.Event | None = None
 
     async def play(
         self,
@@ -133,69 +135,109 @@ class WindowsAudioPlayer:
         if not 0 <= volume <= 100:
             raise ValueError("volume must be between 0 and 100")
 
-        iterator = values.__aiter__()
+        if self._active_done is not None and not self._active_done.is_set():
+            raise RuntimeError("audio playback is already active")
+        stop_event = asyncio.Event()
+        done_event = asyncio.Event()
+        self._active_stop = stop_event
+        self._active_done = done_event
+
         try:
-            first = await anext(iterator)
-        except StopAsyncIteration:
-            return
-        first_buffer, audio_format = await asyncio.to_thread(
-            _read_value, first, volume, None
-        )
-        loop = asyncio.get_running_loop()
-        state = _StreamState(
-            loop,
-            self._sounddevice.CallbackStop,
-            max_buffered_values=self._max_buffered_values,
-        )
-        state.append(first_buffer)
-        producer = asyncio.create_task(
-            self._feed(iterator, volume, audio_format, state)
-        )
-        dispatcher = asyncio.create_task(
-            _dispatch_events(state.events, on_started, on_finished)
-        )
-        stream = None
-        completed = False
-        try:
-            stream = await asyncio.to_thread(
-                self._sounddevice.OutputStream,
-                samplerate=audio_format.sample_rate,
-                channels=audio_format.channels,
-                dtype="float32",
-                blocksize=0,
-                callback=state.callback,
-                finished_callback=state.finished_callback,
+            iterator = values.__aiter__()
+            try:
+                first = await anext(iterator)
+            except StopAsyncIteration:
+                return
+            first_buffer, audio_format = await asyncio.to_thread(
+                _read_value, first, volume, None
             )
-            await asyncio.to_thread(stream.start)
-            await state.finished.wait()
-            completed = True
-            await producer
-            await state.events.put(None)
-            await dispatcher
-            if state.output_underflows:
-                LOGGER.warning(
-                    "Audio output underflow detected",
-                    extra={
-                        "component": "playback",
-                        "event": "audio.underflow",
-                        "underflows": state.output_underflows,
-                    },
+            if stop_event.is_set():
+                return
+            loop = asyncio.get_running_loop()
+            state = _StreamState(
+                loop,
+                self._sounddevice.CallbackStop,
+                max_buffered_values=self._max_buffered_values,
+            )
+            state.append(first_buffer)
+            producer = asyncio.create_task(
+                self._feed(iterator, volume, audio_format, state)
+            )
+            dispatcher = asyncio.create_task(
+                _dispatch_events(state.events, on_started, on_finished)
+            )
+            stream = None
+            completed = False
+            finish_waiter = asyncio.create_task(state.finished.wait())
+            stop_waiter = asyncio.create_task(stop_event.wait())
+            try:
+                stream = await asyncio.to_thread(
+                    self._sounddevice.OutputStream,
+                    samplerate=audio_format.sample_rate,
+                    channels=audio_format.channels,
+                    dtype="float32",
+                    blocksize=0,
+                    callback=state.callback,
+                    finished_callback=state.finished_callback,
                 )
-            if state.source_error is not None:
-                raise state.source_error
+                if stop_event.is_set():
+                    return
+                await asyncio.to_thread(stream.start)
+                done, _ = await asyncio.wait(
+                    {finish_waiter, stop_waiter},
+                    return_when=asyncio.FIRST_COMPLETED,
+                )
+                if stop_waiter in done:
+                    return
+                completed = True
+                await producer
+                await state.events.put(None)
+                await dispatcher
+                if state.output_underflows:
+                    LOGGER.warning(
+                        "Audio output underflow detected",
+                        extra={
+                            "component": "playback",
+                            "event": "audio.underflow",
+                            "underflows": state.output_underflows,
+                        },
+                    )
+                if state.source_error is not None:
+                    raise state.source_error
+            finally:
+                for waiter in (finish_waiter, stop_waiter):
+                    if not waiter.done():
+                        waiter.cancel()
+                await asyncio.gather(
+                    finish_waiter,
+                    stop_waiter,
+                    return_exceptions=True,
+                )
+                if not producer.done():
+                    producer.cancel()
+                    await asyncio.gather(producer, return_exceptions=True)
+                if not dispatcher.done():
+                    dispatcher.cancel()
+                    await asyncio.gather(dispatcher, return_exceptions=True)
+                if stream is not None:
+                    if not completed:
+                        abort = getattr(stream, "abort", None)
+                        if abort is not None:
+                            await asyncio.to_thread(abort)
+                    await asyncio.to_thread(stream.close)
         finally:
-            if not producer.done():
-                producer.cancel()
-                await asyncio.gather(producer, return_exceptions=True)
-            if not dispatcher.done():
-                dispatcher.cancel()
-                await asyncio.gather(dispatcher, return_exceptions=True)
-            if stream is not None:
-                if not completed:
-                    abort = getattr(stream, "abort", None)
-                    if abort is not None:
-                        await asyncio.to_thread(abort)
-                await asyncio.to_thread(stream.close)
+            done_event.set()
+            if self._active_stop is stop_event:
+                self._active_stop = None
+                self._active_done = None
+
+    async def stop(self) -> None:
+        stop_event = self._active_stop
+        done_event = self._active_done
+        if stop_event is None or done_event is None:
+            return
+        stop_event.set()
+        await done_event.wait()
 
     async def _feed(
         self,

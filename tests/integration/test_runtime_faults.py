@@ -47,7 +47,7 @@ def test_broken_worker_pool_is_reported_as_503(tts_client, tts_runtime) -> None:
     assert response.json()["job"]["errors"][0]["component"] == "synthesis"
 
 
-def test_missing_sound_asset_reports_a_meaningful_error(
+def test_missing_sound_asset_is_a_successful_no_op(
     tts_client, tts_runtime, tmp_path
 ) -> None:
     tts_runtime.scheduler.sounds = SoundLibrary(tmp_path / "missing-sounds")
@@ -60,11 +60,10 @@ def test_missing_sound_asset_reports_a_meaningful_error(
         },
     )
 
-    assert response.status_code == response.json()["reasonCode"] == 404
-    error = response.json()["job"]["errors"][0]
-    assert error["valueIndex"] == 0
-    assert error["component"] == "sound"
-    assert error["message"] == "Sound file was not found: neutral_gong.wav"
+    assert response.status_code == response.json()["reasonCode"] == 200
+    assert response.json()["reasonText"] == "OK"
+    assert response.json()["job"]["state"] == "finished"
+    assert response.json()["job"]["errors"] == []
 
 
 def test_sound_path_cannot_escape_the_configured_directory(

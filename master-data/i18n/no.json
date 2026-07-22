@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "Behandlingen av den første meldingen kan ta betydelig lengre tid enn de neste meldingene, fordi det nevrale nettverket lastes inn i minnet.",
   "composer.request": "JSON-FORESPØRSEL",
   "composer.reset": "Tilbakestill",
-  "composer.benchmark": "Benchmark",
   "composer.maximize": "Maksimer forespørselsredigering",
   "composer.restore": "Gjenopprett forespørselsredigering",
-  "composer.benchmarkLoaded": "Benchmark-forespørsel lastet inn",
-  "composer.benchmarkError": "Kan ikke laste inn benchmark-forespørselen",
   "composer.status": "JSON er validert før sending",
   "composer.send": "Send forespørsel",
   "composer.sending": "Sender forespørsel…",
@@ -97,5 +94,7 @@
   "network.title": "Nettverksoppsett",
   "network.remoteManagement": "Aktiver ekstern administrasjon",
   "network.remoteWarning": "Ekstern administrasjon avslører oppsettskontroller for ditt LAN.",
-  "general.title": "Generelt oppsett"
+  "general.title": "Generelt oppsett",
+  "dialog.resetMessage": "Vil du virkelig tilbakestille teksten i panelet?",
+  "dialog.confirmReset": "Tilbakestill tekst"
 }

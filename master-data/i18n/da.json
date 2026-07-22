@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "Behandlingen af den første besked kan tage betydeligt længere tid end de efterfølgende beskeder, fordi det neurale netværk indlæses i hukommelsen.",
   "composer.request": "JSON-ANMODNING",
   "composer.reset": "Nulstil",
-  "composer.benchmark": "Benchmark",
   "composer.maximize": "Maksimer anmodningseditor",
   "composer.restore": "Gendan anmodningseditor",
-  "composer.benchmarkLoaded": "Benchmarkanmodning indlæst",
-  "composer.benchmarkError": "Kan ikke indlæse benchmarkanmodningen",
   "composer.status": "JSON er valideret før afsendelse",
   "composer.send": "Send anmodning",
   "composer.sending": "Sender anmodning…",
@@ -97,5 +94,7 @@
   "network.title": "Netværksopsætning",
   "network.remoteManagement": "Aktiver fjernstyring",
   "network.remoteWarning": "Fjernstyring udsætter opsætningskontroller for dit LAN.",
-  "general.title": "Generel opsætning"
+  "general.title": "Generel opsætning",
+  "dialog.resetMessage": "Vil du virkelig nulstille teksten i panelet?",
+  "dialog.confirmReset": "Nulstil tekst"
 }

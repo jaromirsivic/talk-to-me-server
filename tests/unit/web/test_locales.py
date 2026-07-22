@@ -16,7 +16,7 @@ def test_all_locale_files_have_exactly_the_english_keys() -> None:
     assert set(paths) == EXPECTED
     baseline = json.loads(paths["en"].read_text(encoding="utf-8"))
     required = {
-        "composer.benchmark", "composer.maximize", "composer.restore",
+        "composer.maximize", "composer.restore",
         "code.copy", "code.copied", "code.wordWrap", "code.lineNumbers",
         "chat.region", "chat.firstMessageNotice", "voice.title", "voice.current",
         "voice.language", "voice.volume", "voice.search", "voice.filter.all",
@@ -31,6 +31,7 @@ def test_all_locale_files_have_exactly_the_english_keys() -> None:
         "voice.identityRequired", "voice.rightsRequired",
         "network.title", "network.remoteManagement", "network.remoteWarning",
         "general.title", "dialog.cancel", "dialog.save",
+        "dialog.resetMessage", "dialog.confirmReset",
     }
     assert required <= baseline.keys()
     for locale, path in paths.items():
@@ -45,6 +46,16 @@ def test_locale_controller_uses_browser_local_storage_and_text_content() -> None
     assert "localStorage" in source
     assert ".textContent" in source
     assert "innerHTML" not in source
+
+
+def test_czech_reset_confirmation_uses_the_required_wording() -> None:
+    catalog = json.loads(
+        Path("master-data/i18n/cs.json").read_text(encoding="utf-8")
+    )
+
+    assert catalog["dialog.resetMessage"] == (
+        "Opravdu chcete text v panelu resetovat?"
+    )
 
 
 def test_translations_preserve_placeholders_and_are_not_english_fallbacks() -> None:

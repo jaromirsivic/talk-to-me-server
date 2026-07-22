@@ -106,6 +106,37 @@ def test_job_transition_records_wall_and_monotonic_times() -> None:
     assert job.monotonic_times["terminal"] == 900_000_000
 
 
+@pytest.mark.parametrize(
+    "state",
+    [
+        JobState.WAITING,
+        JobState.PROCESSING,
+        JobState.PROCESSED,
+        JobState.PLAYING,
+    ],
+)
+def test_every_nonterminal_job_state_can_be_cancelled(state) -> None:
+    job = Job.from_request(
+        "job-1",
+        TextToSpeechRequest(values=["hello"]),
+        snapshot(),
+        at=NOW,
+        monotonic_ns=0,
+    )
+    if state is not JobState.WAITING:
+        job.transition(JobState.PROCESSING, at=NOW, monotonic_ns=1)
+    if state in {JobState.PROCESSED, JobState.PLAYING}:
+        job.transition(JobState.PROCESSED, at=NOW, monotonic_ns=2)
+    if state is JobState.PLAYING:
+        job.transition(JobState.PLAYING, at=NOW, monotonic_ns=3)
+
+    job.transition(JobState.CANCELLED, at=NOW, monotonic_ns=4)
+
+    assert job.state is JobState.CANCELLED
+    assert job.state.is_terminal
+    assert job.monotonic_times["terminal"] == 4
+
+
 def test_job_can_start_playback_before_all_synthesis_finishes() -> None:
     job = Job.from_request(
         "job-1",

@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "Ensimmäisen viestin käsittely voi kestää huomattavasti kauemmin kuin seuraavien viestien, koska neuroverkkoa ladataan muistiin.",
   "composer.request": "JSON-PYYNTÖ",
   "composer.reset": "Nollaa",
-  "composer.benchmark": "Vertailuarvo",
   "composer.maximize": "Maksimoi pyyntöeditori",
   "composer.restore": "Palauta pyyntöeditori",
-  "composer.benchmarkLoaded": "Vertailupyyntö ladattu",
-  "composer.benchmarkError": "Vertailupyyntöä ei voi ladata",
   "composer.status": "JSON tarkistetaan ennen lähettämistä",
   "composer.send": "Lähetä pyyntö",
   "composer.sending": "Pyynnön lähettäminen",
@@ -97,5 +94,7 @@
   "network.title": "Verkkoasetukset",
   "network.remoteManagement": "Ota etähallinta käyttöön",
   "network.remoteWarning": "Etähallinta paljastaa asetukset LAN:lle.",
-  "general.title": "Yleiset asetukset"
+  "general.title": "Yleiset asetukset",
+  "dialog.resetMessage": "Haluatko varmasti palauttaa paneelin tekstin?",
+  "dialog.confirmReset": "Palauta teksti"
 }

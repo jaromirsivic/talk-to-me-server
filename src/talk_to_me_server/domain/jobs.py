@@ -19,10 +19,11 @@ class JobState(StrEnum):
     PLAYING = "playing"
     FINISHED = "finished"
     FAILED = "failed"
+    CANCELLED = "cancelled"
 
     @property
     def is_terminal(self) -> bool:
-        return self in {self.FINISHED, self.FAILED}
+        return self in {self.FINISHED, self.FAILED, self.CANCELLED}
 
 
 class ValueState(StrEnum):
@@ -32,28 +33,40 @@ class ValueState(StrEnum):
     PLAYING = "playing"
     FINISHED = "finished"
     FAILED = "failed"
+    CANCELLED = "cancelled"
 
     @property
     def is_terminal(self) -> bool:
-        return self in {self.FINISHED, self.FAILED}
+        return self in {self.FINISHED, self.FAILED, self.CANCELLED}
 
 
 JOB_TRANSITIONS: dict[JobState, set[JobState]] = {
-    JobState.WAITING: {JobState.PROCESSING, JobState.FAILED},
-    JobState.PROCESSING: {JobState.PROCESSED, JobState.PLAYING, JobState.FAILED},
-    JobState.PROCESSED: {JobState.PLAYING, JobState.FAILED},
-    JobState.PLAYING: {JobState.FINISHED, JobState.FAILED},
+    JobState.WAITING: {JobState.PROCESSING, JobState.FAILED, JobState.CANCELLED},
+    JobState.PROCESSING: {
+        JobState.PROCESSED,
+        JobState.PLAYING,
+        JobState.FAILED,
+        JobState.CANCELLED,
+    },
+    JobState.PROCESSED: {JobState.PLAYING, JobState.FAILED, JobState.CANCELLED},
+    JobState.PLAYING: {JobState.FINISHED, JobState.FAILED, JobState.CANCELLED},
     JobState.FINISHED: set(),
     JobState.FAILED: set(),
+    JobState.CANCELLED: set(),
 }
 
 VALUE_TRANSITIONS: dict[ValueState, set[ValueState]] = {
-    ValueState.WAITING: {ValueState.PROCESSING, ValueState.FAILED},
-    ValueState.PROCESSING: {ValueState.PROCESSED, ValueState.FAILED},
-    ValueState.PROCESSED: {ValueState.PLAYING, ValueState.FAILED},
-    ValueState.PLAYING: {ValueState.FINISHED, ValueState.FAILED},
+    ValueState.WAITING: {ValueState.PROCESSING, ValueState.FAILED, ValueState.CANCELLED},
+    ValueState.PROCESSING: {
+        ValueState.PROCESSED,
+        ValueState.FAILED,
+        ValueState.CANCELLED,
+    },
+    ValueState.PROCESSED: {ValueState.PLAYING, ValueState.FAILED, ValueState.CANCELLED},
+    ValueState.PLAYING: {ValueState.FINISHED, ValueState.FAILED, ValueState.CANCELLED},
     ValueState.FINISHED: set(),
     ValueState.FAILED: set(),
+    ValueState.CANCELLED: set(),
 }
 
 
@@ -121,7 +134,7 @@ class JobValue:
             self.playback_finished_at = at
             self.monotonic_times["playbackFinished"] = monotonic_ns
             self.monotonic_times["terminal"] = monotonic_ns
-        elif target is ValueState.FAILED:
+        elif target in {ValueState.FAILED, ValueState.CANCELLED}:
             self._record_failure(at, monotonic_ns)
 
     def _record_failure(self, at: datetime, monotonic_ns: int) -> None:
@@ -223,7 +236,7 @@ class Job:
             self.playback_finished_at = at
             self.monotonic_times["playbackFinished"] = monotonic_ns
             self.monotonic_times["terminal"] = monotonic_ns
-        elif target is JobState.FAILED:
+        elif target in {JobState.FAILED, JobState.CANCELLED}:
             self._record_failure(at, monotonic_ns)
         if error is not None:
             self.add_error(error)

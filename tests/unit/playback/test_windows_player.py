@@ -214,3 +214,43 @@ async def test_windows_player_finishes_zero_duration_pause(tmp_path) -> None:
     await WindowsAudioPlayer(sounddevice).play(values(), 100, started, finished)
 
     assert events == [("started", 0), ("finished", 0)]
+
+
+@pytest.mark.asyncio
+async def test_windows_player_stop_aborts_active_audio_and_allows_later_playback(
+    tmp_path,
+) -> None:
+    long_path = tmp_path / "long.wav"
+    short_path = tmp_path / "short.wav"
+    _wav(long_path, [16_384] * 100_000)
+    _wav(short_path, [-16_384, -16_384])
+    sounddevice = FakeSoundDevice(block_frames=2)
+    player = WindowsAudioPlayer(sounddevice)
+    events = []
+
+    async def long_values():
+        yield PlaybackValue(0, long_path)
+
+    async def short_values():
+        yield PlaybackValue(1, short_path)
+
+    async def started(index):
+        events.append(("started", index))
+
+    async def finished(index):
+        events.append(("finished", index))
+
+    active = asyncio.create_task(
+        player.play(long_values(), 100, started, finished)
+    )
+    while ("started", 0) not in events:
+        await asyncio.sleep(0.001)
+
+    await player.stop()
+    await asyncio.wait_for(active, timeout=2)
+    assert sounddevice.stream_kwargs is not None
+    assert ("finished", 0) not in events
+
+    await player.play(short_values(), 100, started, finished)
+
+    assert events[-2:] == [("started", 1), ("finished", 1)]

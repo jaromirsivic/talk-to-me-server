@@ -1,8 +1,7 @@
 {
-  "values": [
-    "Hello from TalkToMe Server."
-  ],
+  "value": "If you here this voice then talk to me server works. You can play positive gong {{play('positive_gong.wav')}} or neutral gong {{play('neutral_gong.wav')}} or negative gong {{play('negative_gong.wav')}}. And make a pause {{pause(2000)}} in the middle of a text. {{pause(500)}} You can control the priority of text to speech conversion using the importance parameter. If importance is set to high, the text is added to the end of the queue and played when its turn comes. If importance is set to low, the text is played immediately if the queue is empty. If there is at least one text item waiting in the queue, it is not played at all. {{pause(500)}} You can adjust the text volume using the volume multiplier parameter. {{pause(500)}} Setting the calculate stats parameter to true runs the model’s performance tests. {{pause(500)}} And if you want to wait until the entire text has been played, set wait until playback finished to true. If wait until playback finished parameter is set to false, the server returns a response immediately.",
   "importance": "high",
+  "volumeMultiplier": 0.95,
   "calculateStats": false,
   "waitUntilPlaybackFinished": false
 }

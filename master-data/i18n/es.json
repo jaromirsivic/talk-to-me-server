@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "El procesamiento del primer mensaje puede tardar bastante más que el de los mensajes siguientes, porque la red neuronal se está cargando en la memoria.",
   "composer.request": "SOLICITUD JSON",
   "composer.reset": "Reiniciar",
-  "composer.benchmark": "Punto de referencia",
   "composer.maximize": "Maximizar el editor de solicitudes",
   "composer.restore": "Restaurar editor de solicitudes",
-  "composer.benchmarkLoaded": "Solicitud de benchmark cargada",
-  "composer.benchmarkError": "No se pudo cargar la solicitud de benchmark",
   "composer.status": "JSON se valida antes de enviar",
   "composer.send": "Enviar solicitud",
   "composer.sending": "Enviando solicitud...",
@@ -97,5 +94,7 @@
   "network.title": "Configuración de red",
   "network.remoteManagement": "Habilitar la gestión remota",
   "network.remoteWarning": "La administración remota expone los controles de configuración de su LAN.",
-  "general.title": "Configuración general"
+  "general.title": "Configuración general",
+  "dialog.resetMessage": "¿Realmente desea restablecer el texto del panel?",
+  "dialog.confirmReset": "Restablecer texto"
 }

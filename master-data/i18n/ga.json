@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "D’fhéadfadh sé i bhfad níos faide an chéad teachtaireacht a phróiseáil ná na teachtaireachtaí ina diaidh, toisc go bhfuil an líonra néarach á luchtú sa chuimhne.",
   "composer.request": "IARRATAS JSON",
   "composer.reset": "Athshocraigh",
-  "composer.benchmark": "Tagarmharc",
   "composer.maximize": "Eagarthóir iarratais a uasmhéadú",
   "composer.restore": "Athchóirigh eagarthóir iarratais",
-  "composer.benchmarkLoaded": "Iarratas tagarmhairc luchtaithe",
-  "composer.benchmarkError": "Ní féidir an t-iarratas tagarmharcála a lódáil",
   "composer.status": "Tá JSON bailíochtaithe roimh é a sheoladh",
   "composer.send": "Seol iarratas",
   "composer.sending": "Iarratas á sheoladhâ€¦",
@@ -97,5 +94,7 @@
   "network.title": "Socrú Líonra",
   "network.remoteManagement": "Cumasaigh cianbhainistiú",
   "network.remoteWarning": "Nochtann an chianbhainistíocht rialuithe socraithe do do LAN.",
-  "general.title": "Socrú Ginearálta"
+  "general.title": "Socrú Ginearálta",
+  "dialog.resetMessage": "An bhfuil tú cinnte gur mhaith leat an téacs sa phainéal a athshocrú?",
+  "dialog.confirmReset": "Athshocraigh an téacs"
 }

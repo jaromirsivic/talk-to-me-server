@@ -63,6 +63,53 @@ raise SystemExit(1)
 PY
 }
 
+listener_pids() {
+    if command -v lsof >/dev/null 2>&1; then
+        lsof -nP -t -iTCP:"$port" -sTCP:LISTEN 2>/dev/null || true
+        return 0
+    fi
+    if command -v ss >/dev/null 2>&1; then
+        ss -ltnp 2>/dev/null | awk -v port="$port" '
+            $4 ~ (":" port "$") {
+                line = $0
+                while (match(line, /pid=[0-9]+/)) {
+                    print substr(line, RSTART + 4, RLENGTH - 4)
+                    line = substr(line, RSTART + RLENGTH)
+                }
+            }
+        ' | sort -u
+        return 0
+    fi
+    echo "Cannot identify the listener process. Install lsof or ss." >&2
+    return 2
+}
+
+is_descendant() {
+    child_pid=$1
+    root_pid=$2
+    while [ "$child_pid" -gt 0 ] 2>/dev/null; do
+        [ "$child_pid" -eq "$root_pid" ] && return 0
+        child_pid=$(ps -p "$child_pid" -o ppid= 2>/dev/null | tr -d '[:space:]')
+        case "$child_pid" in
+            ''|*[!0-9]*) return 1 ;;
+        esac
+    done
+    return 1
+}
+
+listener_belongs_to_server() {
+    found_listener=0
+    pids=$(listener_pids) || return $?
+    for listener_pid in $pids; do
+        found_listener=1
+        if is_descendant "$listener_pid" "$server_pid"; then
+            return 0
+        fi
+    done
+    [ "$found_listener" -eq 1 ] && return 1
+    return 1
+}
+
 is_project_server() {
     server_command=$(ps -p "$server_pid" -o command= 2>/dev/null || true)
     case "$server_command" in
@@ -88,16 +135,25 @@ if [ -f "$pid_file" ]; then
             echo "PID $server_pid does not belong to this TalkToMe server." >&2
             exit 1
         fi
-        if port_is_open; then
+        if port_is_open && listener_belongs_to_server; then
             echo "TalkToMe server is already running. PID: $server_pid"
             write_location
             exit 0
+        fi
+        if port_is_open; then
+            echo "The configured port is owned by another process, not by PID $server_pid." >&2
+            exit 1
         fi
         echo "TalkToMe process $server_pid exists, but the configured port is not ready." >&2
         echo "Inspect $stderr_path and $stdout_path before retrying." >&2
         exit 1
     fi
     rm -f "$pid_file"
+fi
+
+if port_is_open; then
+    echo "The configured port is owned by another process. Refusing to report a false successful start." >&2
+    exit 1
 fi
 
 cd "$project_root"
@@ -110,7 +166,7 @@ while [ "$attempt" -lt 150 ]; do
     if ! kill -0 "$server_pid" 2>/dev/null; then
         break
     fi
-    if port_is_open; then
+    if port_is_open && listener_belongs_to_server; then
         echo "TalkToMe server started. PID: $server_pid"
         write_location
         exit 0

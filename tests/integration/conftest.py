@@ -50,6 +50,9 @@ class FakeAudioPlayer:
                 self.played.append(data.decode("utf-8"))
             await on_finished(value.index)
 
+    async def stop(self) -> None:
+        return None
+
 
 class FakeTextSegmenter:
     async def split(self, text: str, _speaker: str) -> list[str]:

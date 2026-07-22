@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "Przetwarzanie pierwszej wiadomości może potrwać znacznie dłużej niż kolejnych, ponieważ sieć neuronowa jest ładowana do pamięci.",
   "composer.request": "ŻĄDANIE JSON",
   "composer.reset": "Zresetuj",
-  "composer.benchmark": "Punkt odniesienia",
   "composer.maximize": "Maksymalizuj edytor żądań",
   "composer.restore": "Przywróć edytor żądań",
-  "composer.benchmarkLoaded": "Załadowano żądanie testu porównawczego",
-  "composer.benchmarkError": "Nie można załadować żądania testu porównawczego",
   "composer.status": "JSON jest sprawdzany przed wysłaniem",
   "composer.send": "Wyślij prośbę",
   "composer.sending": "Wysyłam prośbę...",
@@ -97,5 +94,7 @@
   "network.title": "Konfiguracja sieci",
   "network.remoteManagement": "Włącz zdalne zarządzanie",
   "network.remoteWarning": "Zdalne zarządzanie zapewnia kontrolę nad konfiguracją w Twojej sieci LAN.",
-  "general.title": "Konfiguracja ogólna"
+  "general.title": "Konfiguracja ogólna",
+  "dialog.resetMessage": "Czy na pewno chcesz zresetować tekst w panelu?",
+  "dialog.confirmReset": "Zresetuj tekst"
 }

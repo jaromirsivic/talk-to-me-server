@@ -50,6 +50,50 @@ raise SystemExit(1)
 PY
 }
 
+listener_pids() {
+    if command -v lsof >/dev/null 2>&1; then
+        lsof -nP -t -iTCP:"$port" -sTCP:LISTEN 2>/dev/null || true
+        return 0
+    fi
+    if command -v ss >/dev/null 2>&1; then
+        ss -ltnp 2>/dev/null | awk -v port="$port" '
+            $4 ~ (":" port "$") {
+                line = $0
+                while (match(line, /pid=[0-9]+/)) {
+                    print substr(line, RSTART + 4, RLENGTH - 4)
+                    line = substr(line, RSTART + RLENGTH)
+                }
+            }
+        ' | sort -u
+        return 0
+    fi
+    echo "Cannot identify the listener process. Install lsof or ss." >&2
+    return 2
+}
+
+is_descendant() {
+    child_pid=$1
+    root_pid=$2
+    while [ "$child_pid" -gt 0 ] 2>/dev/null; do
+        [ "$child_pid" -eq "$root_pid" ] && return 0
+        child_pid=$(ps -p "$child_pid" -o ppid= 2>/dev/null | tr -d '[:space:]')
+        case "$child_pid" in
+            ''|*[!0-9]*) return 1 ;;
+        esac
+    done
+    return 1
+}
+
+listener_belongs_to_server() {
+    pids=$(listener_pids) || return $?
+    for listener_pid in $pids; do
+        if is_descendant "$listener_pid" "$server_pid"; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 write_port_status() {
     if port_is_open; then
         echo "Port $port is in use."
@@ -92,6 +136,10 @@ if ! is_project_server; then
     write_port_status
     echo "PID $server_pid does not belong to this TalkToMe server. Refusing to stop it." >&2
     exit 1
+fi
+
+if port_is_open && ! listener_belongs_to_server; then
+    echo "The configured port is owned by another process. Only the validated project process will be stopped." >&2
 fi
 
 kill -TERM "$server_pid"

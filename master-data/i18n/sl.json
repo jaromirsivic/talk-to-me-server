@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "Obdelava prvega sporočila lahko traja bistveno dlje kot obdelava naslednjih sporočil, ker se nevronska mreža nalaga v pomnilnik.",
   "composer.request": "ZAHTEVA JSON",
   "composer.reset": "Ponastavi",
-  "composer.benchmark": "Benchmark",
   "composer.maximize": "Povečanje urejevalnika zahtev",
   "composer.restore": "Urejevalnik zahtev za obnovitev",
-  "composer.benchmarkLoaded": "Zahteva za primerjalno analizo je naložena",
-  "composer.benchmarkError": "Zahteve za primerjalno analizo ni mogoče naložiti",
   "composer.status": "JSON je preverjen pred pošiljanjem",
   "composer.send": "Pošlji zahtevo",
   "composer.sending": "Pošiljanje zahteve...",
@@ -97,5 +94,7 @@
   "network.title": "Nastavitev omrežja",
   "network.remoteManagement": "Omogoči daljinsko upravljanje",
   "network.remoteWarning": "Oddaljeno upravljanje razkrije nastavitvene kontrole vašemu LAN-ju.",
-  "general.title": "Splošna nastavitev"
+  "general.title": "Splošna nastavitev",
+  "dialog.resetMessage": "Ali res želite ponastaviti besedilo na plošči?",
+  "dialog.confirmReset": "Ponastavi besedilo"
 }

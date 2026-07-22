@@ -4,8 +4,8 @@ import asyncio
 import logging
 from collections.abc import AsyncIterator
 
-from talk_to_me_server.domain.jobs import Job, JobError
-from talk_to_me_server.domain.queue import QueueManager, ValueNotPlayable
+from talk_to_me_server.domain.jobs import Job, JobError, JobState
+from talk_to_me_server.domain.queue import JobCancelled, QueueManager, ValueNotPlayable
 from talk_to_me_server.playback.base import AudioPlayer, PlaybackValue
 from talk_to_me_server.storage.archive import JobArchive
 from talk_to_me_server.tts.pauses import PauseCommand
@@ -37,8 +37,12 @@ class PlaybackCoordinator:
     async def _play(self, job: Job) -> None:
         try:
             await self._play_with_retry(job)
-            await self.queue.wait_synthesis_finished(job.id)
+            current = await self.queue.wait_synthesis_finished(job.id)
+            if current.state is JobState.CANCELLED:
+                return
             terminal = await self.queue.finish(job.id)
+        except JobCancelled:
+            return
         except ValueNotPlayable:
             current = await self.queue.wait_synthesis_finished(job.id)
             if current.state.is_terminal:
@@ -61,6 +65,8 @@ class PlaybackCoordinator:
                     component="playback",
                 ),
             )
+        if terminal.state is JobState.CANCELLED:
+            return
         self.archive.finalize(terminal)
         if not _client_waits(terminal):
             await self.queue.release(terminal.id)
@@ -115,6 +121,11 @@ class PlaybackCoordinator:
                 index=value.index,
                 path=self.archive.value_path(job.id, value.index),
             )
+
+    async def stop(self) -> None:
+        stop_player = getattr(self.player, "stop", None)
+        if stop_player is not None:
+            await stop_player()
 
 
 def _client_waits(job: Job) -> bool:

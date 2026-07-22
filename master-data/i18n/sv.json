@@ -14,11 +14,8 @@
   "chat.firstMessageNotice": "Bearbetningen av det första meddelandet kan ta betydligt längre tid än efterföljande meddelanden, eftersom det neurala nätverket läses in i minnet.",
   "composer.request": "JSON-BEGÄRAN",
   "composer.reset": "Återställ",
-  "composer.benchmark": "Benchmark",
   "composer.maximize": "Maximera begäran editor",
   "composer.restore": "Återställ förfrågningsredigerare",
-  "composer.benchmarkLoaded": "Benchmark-begäran har laddats",
-  "composer.benchmarkError": "Det gick inte att läsa in benchmark-begäran",
   "composer.status": "JSON valideras innan sändning",
   "composer.send": "Skicka förfrågan",
   "composer.sending": "Skickar förfrågan…",
@@ -97,5 +94,7 @@
   "network.title": "Nätverksinställningar",
   "network.remoteManagement": "Aktivera fjärrhantering",
   "network.remoteWarning": "Fjärrhantering exponerar inställningskontroller för ditt LAN.",
-  "general.title": "Allmän inställning"
+  "general.title": "Allmän inställning",
+  "dialog.resetMessage": "Vill du verkligen återställa texten i panelen?",
+  "dialog.confirmReset": "Återställ text"
 }
