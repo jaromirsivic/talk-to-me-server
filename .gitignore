@@ -1,6 +1,8 @@
 # Local worktrees and Codex state
 .worktrees/
 .superpowers/
+.administration/
+.agents/
 .local-safety-off
 .global-safety-off
 
