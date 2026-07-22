@@ -41,6 +41,7 @@
   "settings.saving": "Экономия…",
   "settings.saved": "Настройки сохранены.",
   "settings.applied": "Настройки применяются немедленно",
+  "toast.restartRequired": "Требуется перезапуск сервера",
   "theme.applied": "Тема применена немедленно",
   "voice.title": "Голосовая настройка",
   "voice.current": "Текущий голос: {name}",

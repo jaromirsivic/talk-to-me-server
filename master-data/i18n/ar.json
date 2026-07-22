@@ -41,6 +41,7 @@
   "settings.saving": "التوفير...",
   "settings.saved": "تم حفظ الإعدادات",
   "settings.applied": "تم تطبيق الإعدادات على الفور",
+  "toast.restartRequired": "إعادة تشغيل الخادم مطلوبة",
   "theme.applied": "تم تطبيق الموضوع على الفور",
   "voice.title": "إعداد الصوت",
   "voice.current": "الصوت الحالي: {name}",

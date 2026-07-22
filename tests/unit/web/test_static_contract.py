@@ -14,11 +14,11 @@ def test_portal_has_semantic_shell_and_accessible_json_composer() -> None:
     assert 'data-i18n-aria-label="chat.region"' in html
     assert 'id="benchmark-request"' not in html
     assert 'id="reset-confirm-dialog"' in html
-    assert 'href="/styles.css?v=sprint-0003"' in html
-    assert 'src="/js/app.js?v=sprint-0003"' in html
+    assert 'href="/styles.css?v=sprint-0004"' in html
+    assert 'src="/js/app.js?v=sprint-0004"' in html
 
 
-def test_first_message_notice_is_inserted_before_the_first_request() -> None:
+def test_first_message_notice_is_inserted_after_the_first_request() -> None:
     app = Path("web/js/app.js").read_text(encoding="utf-8")
     chat = Path("web/js/chat.js").read_text(encoding="utf-8")
     css = Path("web/styles.css").read_text(encoding="utf-8")
@@ -26,7 +26,7 @@ def test_first_message_notice_is_inserted_before_the_first_request() -> None:
     notice_call = "appendFirstMessageNotice(history)"
     request_call = 'appendChatCard(history, "request"'
     assert notice_call in app
-    assert app.index(notice_call) < app.index(request_call)
+    assert app.index(request_call) < app.index(notice_call)
     assert 'history.querySelector(\'[data-kind="request"]\')' in app
     assert 'notice.dataset.i18n = "chat.firstMessageNotice"' in chat
     assert 'notice.setAttribute("role", "status")' in chat
@@ -219,13 +219,39 @@ def test_voice_setup_has_summary_filter_and_local_only_collapsed_import() -> Non
     assert 'type="submit">Save settings</button>' in html
 
 
-def test_portal_toast_uses_top_layer_and_has_a_close_button() -> None:
+def test_portal_toasts_use_a_stacking_host_and_reusable_template() -> None:
     html = Path("web/index.html").read_text(encoding="utf-8")
+    settings = Path("web/js/settings.js").read_text(encoding="utf-8")
+    css = Path("web/styles.css").read_text(encoding="utf-8")
 
-    assert 'id="portal-toast"' in html
-    assert 'popover="manual"' in html
+    assert 'id="toast-host"' in html
+    assert 'id="toast-template"' in html
     assert 'data-toast-message' in html
+    assert 'data-toast-countdown' in html
     assert 'data-toast-close' in html
+    assert 'cloneNode(true)' in settings
+    assert 'const TOAST_SECONDS = 9' in settings
+    assert 'setInterval' in settings
+    assert 'toast.remove()' in settings
+    assert '.toast-host' in css
+    assert '.toast[data-kind="success"]' in css
+    assert '.toast[data-kind="warning"]' in css
+    assert '.toast[data-kind="error"]' in css
+    assert ':root[data-theme="dark"] .toast[data-kind="success"]' in css
+    assert ':root[data-theme="dark"] .toast[data-kind="warning"]' in css
+    assert ':root[data-theme="dark"] .toast[data-kind="error"]' in css
+
+
+def test_changed_toast_modules_share_the_current_cache_version() -> None:
+    app = Path("web/js/app.js").read_text(encoding="utf-8")
+    theme = Path("web/js/theme.js").read_text(encoding="utf-8")
+    voices = Path("web/js/voices.js").read_text(encoding="utf-8")
+
+    assert 'from "./settings.js?v=sprint-0004"' in app
+    assert 'from "./theme.js?v=sprint-0004"' in app
+    assert 'from "./voices.js?v=sprint-0004"' in app
+    assert 'from "./settings.js?v=sprint-0004"' in theme
+    assert 'from "./settings.js?v=sprint-0004"' in voices
 
 
 def test_voice_download_dialog_has_an_accessible_progress_state() -> None:

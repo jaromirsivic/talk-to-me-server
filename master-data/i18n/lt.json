@@ -41,6 +41,7 @@
   "settings.saving": "Taupymas",
   "settings.saved": "Nustatymai išsaugoti",
   "settings.applied": "Nustatymai pritaikyti nedelsiant",
+  "toast.restartRequired": "Reikia paleisti serverį iš naujo",
   "theme.applied": "Tema pritaikyta iš karto",
   "voice.title": "Balso sąranka",
   "voice.current": "Dabartinis balsas: {name}",

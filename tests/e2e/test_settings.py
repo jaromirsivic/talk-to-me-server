@@ -9,7 +9,11 @@ def test_restart_field_is_reported_without_server_restart(page: Page, live_serve
     workers.fill("6")
     page.get_by_role("button", name="Save settings").click()
 
-    expect(page.get_by_text("Restart required: general.workers")).to_be_visible()
+    toast = page.locator('.toast[data-kind="warning"]')
+    expect(toast).to_contain_text("Settings saved (Server restart required)")
+    expect(toast).to_contain_text("general.workers")
+    expect(toast).to_contain_text("(9)")
+    expect(toast).to_have_css("background-color", "rgb(254, 226, 226)")
     assert live_server.process_id == live_server.original_process_id
 
 

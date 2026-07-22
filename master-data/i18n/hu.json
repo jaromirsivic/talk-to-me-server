@@ -41,6 +41,7 @@
   "settings.saving": "Mentés",
   "settings.saved": "Beállítások mentve",
   "settings.applied": "A beállítások azonnal alkalmazva",
+  "toast.restartRequired": "A szerver újraindítása szükséges",
   "theme.applied": "A téma azonnal alkalmazva lett",
   "voice.title": "Hangbeállítás",
   "voice.current": "Jelenlegi hang: {name}",

@@ -41,6 +41,7 @@
   "settings.saving": "Säästäminen",
   "settings.saved": "Asetukset tallennettu",
   "settings.applied": "Asetukset otettiin käyttöön välittömästi",
+  "toast.restartRequired": "Palvelin on käynnistettävä uudelleen",
   "theme.applied": "Teema tuli voimaan heti",
   "voice.title": "Ääniasetukset",
   "voice.current": "Nykyinen ääni: {name}",

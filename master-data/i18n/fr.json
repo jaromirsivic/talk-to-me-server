@@ -41,6 +41,7 @@
   "settings.saving": "Économiser…",
   "settings.saved": "Paramètres enregistrés",
   "settings.applied": "Paramètres appliqués immédiatement",
+  "toast.restartRequired": "Redémarrage du serveur requis",
   "theme.applied": "Thème appliqué immédiatement",
   "voice.title": "Configuration vocale",
   "voice.current": "Voix actuelle : {name}",

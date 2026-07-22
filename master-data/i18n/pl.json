@@ -41,6 +41,7 @@
   "settings.saving": "Oszczędzanie...",
   "settings.saved": "Ustawienia zostały zapisane",
   "settings.applied": "Ustawienia zostały zastosowane natychmiast",
+  "toast.restartRequired": "Wymagane jest ponowne uruchomienie serwera",
   "theme.applied": "Motyw zastosowany natychmiast",
   "voice.title": "Konfiguracja głosu",
   "voice.current": "Obecny głos: {name}",

@@ -41,6 +41,7 @@
   "settings.saving": "Besparenâ€¦",
   "settings.saved": "Instellingen opgeslagen",
   "settings.applied": "Instellingen worden onmiddellijk toegepast",
+  "toast.restartRequired": "Server moet opnieuw worden gestart",
   "theme.applied": "Thema onmiddellijk toegepast",
   "voice.title": "Stemconfiguratie",
   "voice.current": "Huidige stem: {name}",

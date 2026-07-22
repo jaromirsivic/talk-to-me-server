@@ -41,6 +41,7 @@
   "settings.saving": "Збереження...",
   "settings.saved": "Налаштування збережено",
   "settings.applied": "Налаштування застосовані негайно",
+  "toast.restartRequired": "Потрібне перезавантаження сервера",
   "theme.applied": "Тема застосована негайно",
   "voice.title": "Налаштування голосу",
   "voice.current": "Поточний голос: {name}",

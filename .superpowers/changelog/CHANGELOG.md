@@ -67,3 +67,12 @@
 - Webový portál každou sekundu zjišťuje stav fronty a podle něj řídí lokalizované červené tlačítko Stop.
 - Stop okamžitě zakáže ovládací prvek, zruší frontu a zastaví zvuk, přičemž zachová syntetizační worker pool pro další požadavky.
 - Doplněny překlady ve všech podporovaných jazycích, verzování webových prostředků, API dokumentace a automatické testy.
+
+## Pořadí první zprávy a skládané toastové notifikace
+
+- Upozornění k prvnímu požadavku se zobrazuje mezi kartou požadavku a odpovědí serveru.
+- Toastové notifikace se skládají v pravé části stránky, mají samostatné odpočty od 9 do 1, automatické zavření a nezávislé křížky.
+- Pozitivní notifikace používají zelený vzhled, zatímco varování a chyby používají červený vzhled ve světlém i tmavém motivu.
+- Akce vyžadující restart zobrazují lokalizované varování včetně dotčených konfiguračních polí ve všech podporovaných jazycích.
+- Verzování webových assetů bylo zvýšeno na `sprint-0004`, aby prohlížeč nekombinoval nové HTML se starými toastovými moduly z cache.
+- Statické a E2E testy ověřují pořadí chatu, skládání toastů, odpočet, barvy, zavírání, restartové varování a společnou verzi modulů.

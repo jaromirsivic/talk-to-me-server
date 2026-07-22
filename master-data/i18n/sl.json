@@ -41,6 +41,7 @@
   "settings.saving": "Varčevanje...",
   "settings.saved": "Nastavitve shranjene",
   "settings.applied": "Nastavitve so uporabljene takoj",
+  "toast.restartRequired": "Potreben je ponovni zagon strežnika",
   "theme.applied": "Tema je bila uporabljena takoj",
   "voice.title": "Glasovna nastavitev",
   "voice.current": "Trenutni glas: {name}",

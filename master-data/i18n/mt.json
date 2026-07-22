@@ -41,6 +41,7 @@
   "settings.saving": "Iffrankar...",
   "settings.saved": "Is-settings ġew issejvjati",
   "settings.applied": "Is-settings ġew applikati immedjatament",
+  "toast.restartRequired": "Huwa meħtieġ li s-server jerġa' jinbeda",
   "theme.applied": "Tema applikata immedjatament",
   "voice.title": "Setup tal-Vuċi",
   "voice.current": "Vuċi attwali: {name}",

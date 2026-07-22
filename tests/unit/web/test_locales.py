@@ -30,6 +30,7 @@ def test_all_locale_files_have_exactly_the_english_keys() -> None:
         "voice.importError", "voice.selectFilesError",
         "voice.identityRequired", "voice.rightsRequired",
         "network.title", "network.remoteManagement", "network.remoteWarning",
+        "toast.restartRequired",
         "general.title", "dialog.cancel", "dialog.save",
         "dialog.resetMessage", "dialog.confirmReset",
     }

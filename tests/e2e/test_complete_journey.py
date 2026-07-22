@@ -38,7 +38,9 @@ def test_complete_operator_journey(page: Page, live_server) -> None:
     page.get_by_role("button", name="General Setup").click()
     page.get_by_label("Garbage collector timeout").fill("7200")
     page.get_by_role("button", name="Save settings").click()
-    expect(page.get_by_text("Restart required: general.directories")).to_be_visible()
+    expect(page.locator('.toast[data-kind="warning"]')).to_contain_text(
+        "Settings saved (Server restart required)"
+    )
     expect(page.get_by_role("dialog", name="General Setup")).not_to_be_visible()
 
     page.get_by_role("button", name="Language").click()

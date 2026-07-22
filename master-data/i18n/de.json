@@ -41,6 +41,7 @@
   "settings.saving": "Sparen...",
   "settings.saved": "Einstellungen gespeichert",
   "settings.applied": "Einstellungen werden sofort übernommen",
+  "toast.restartRequired": "Serverneustart erforderlich",
   "theme.applied": "Das Thema wurde sofort angewendet",
   "voice.title": "Stimmeinstellungen",
   "voice.current": "Aktuelle Stimme: {name}",

@@ -41,6 +41,7 @@
   "settings.saving": "Saglabāšana",
   "settings.saved": "Iestatījumi saglabāti",
   "settings.applied": "Iestatījumi tika piemēroti nekavējoties",
+  "toast.restartRequired": "Nepieciešama servera restartēšana",
   "theme.applied": "Tēma tika piemērota nekavējoties",
   "voice.title": "Balss iestatīšana",
   "voice.current": "Pašreizējā balss: {name}",

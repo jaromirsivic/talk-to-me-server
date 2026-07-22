@@ -25,7 +25,7 @@ def test_chat_shows_indented_request_and_response(
     page.screenshot(path=tmp_path / f"chat-{viewport['width']}.png", full_page=True)
 
 
-def test_first_message_notice_precedes_first_request_and_appears_once(
+def test_first_message_notice_follows_first_request_and_precedes_response(
     page: Page, live_server
 ) -> None:
     page.goto(live_server.url)
@@ -36,9 +36,16 @@ def test_first_message_notice_precedes_first_request_and_appears_once(
     expect(notice).to_have_count(1)
     expect(request).to_have_count(1)
     expect(notice).to_contain_text("neural network")
-    assert notice.evaluate("node => Boolean(node.compareDocumentPosition(document.querySelector('[data-kind=request]')) & Node.DOCUMENT_POSITION_FOLLOWING)")
+    assert request.evaluate(
+        "node => Boolean(node.compareDocumentPosition(document.querySelector('.first-message-notice')) & Node.DOCUMENT_POSITION_FOLLOWING)"
+    )
 
     expect(page.locator('[data-kind="response"]')).to_have_count(1)
+    response = page.locator('[data-kind="response"]').first
+    assert notice.evaluate(
+        "node => Boolean(node.compareDocumentPosition(document.querySelector('[data-kind=response]')) & Node.DOCUMENT_POSITION_FOLLOWING)"
+    )
+    assert response.is_visible()
     page.get_by_role("button", name="Send request").click()
     expect(page.locator('[data-kind="response"]')).to_have_count(2)
     expect(notice).to_have_count(1)

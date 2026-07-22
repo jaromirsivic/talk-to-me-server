@@ -41,6 +41,7 @@
   "settings.saving": "Sparerâ€¦",
   "settings.saved": "Indstillinger gemt",
   "settings.applied": "Indstillinger blev anvendt med det samme",
+  "toast.restartRequired": "Serveren skal genstartes",
   "theme.applied": "Temaet gjaldt med det samme",
   "voice.title": "Stemmeopsætning",
   "voice.current": "Nuværende stemme: {name}",

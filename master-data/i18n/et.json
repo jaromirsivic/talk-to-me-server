@@ -41,6 +41,7 @@
   "settings.saving": "Salvestamine",
   "settings.saved": "Seaded salvestatud",
   "settings.applied": "Seaded rakendati kohe",
+  "toast.restartRequired": "Server tuleb taaskäivitada",
   "theme.applied": "Teema rakendus kohe",
   "voice.title": "Hääle seadistus",
   "voice.current": "Praegune hääl: {name}",

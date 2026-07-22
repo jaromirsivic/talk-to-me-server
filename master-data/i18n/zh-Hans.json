@@ -41,6 +41,7 @@
   "settings.saving": "节省……",
   "settings.saved": "设置已保存",
   "settings.applied": "立即应用设置",
+  "toast.restartRequired": "需要重启服务器",
   "theme.applied": "主题立即应用",
   "voice.title": "语音设置",
   "voice.current": "当前语音：{name}",

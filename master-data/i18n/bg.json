@@ -41,6 +41,7 @@
   "settings.saving": "Спестяване...",
   "settings.saved": "Настройките са запазени",
   "settings.applied": "Настройките се прилагат веднага",
+  "toast.restartRequired": "Необходимо е рестартиране на сървъра",
   "theme.applied": "Темата е приложена веднага",
   "voice.title": "Гласова настройка",
   "voice.current": "Текущ глас: {name}",

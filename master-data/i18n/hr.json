@@ -41,6 +41,7 @@
   "settings.saving": "Spremanje...",
   "settings.saved": "Postavke su spremljene",
   "settings.applied": "Postavke su primijenjene odmah",
+  "toast.restartRequired": "Potrebno je ponovno pokrenuti poslužitelj",
   "theme.applied": "Tema je primijenjena odmah",
   "voice.title": "Postavljanje glasa",
   "voice.current": "Trenutačni glas: {name}",

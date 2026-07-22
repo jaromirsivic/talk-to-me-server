@@ -1,4 +1,4 @@
-import {getLatestSetup, persistSetup, showToast} from "./settings.js";
+import {getLatestSetup, persistSetup, showToast} from "./settings.js?v=sprint-0004";
 import {translate} from "./i18n.js";
 
 export function initializeTheme() {
@@ -17,7 +17,7 @@ export function initializeTheme() {
       showToast(translate("theme.applied"));
     } catch (error) {
       applyTheme(previous, button);
-      showToast(error.message, true);
+      showToast(error.message, {kind: "error"});
     } finally {
       button.disabled = false;
     }

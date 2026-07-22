@@ -41,6 +41,7 @@
   "settings.saving": "保存中...",
   "settings.saved": "設定が保存されました",
   "settings.applied": "設定はすぐに適用されます",
+  "toast.restartRequired": "サーバーの再起動が必要です",
   "theme.applied": "テーマはすぐに適用されます",
   "voice.title": "音声設定",
   "voice.current": "現在の音声: {name}",

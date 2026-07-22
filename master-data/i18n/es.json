@@ -41,6 +41,7 @@
   "settings.saving": "Guardando...",
   "settings.saved": "Configuración guardada",
   "settings.applied": "Configuración aplicada inmediatamente",
+  "toast.restartRequired": "Se requiere reiniciar el servidor",
   "theme.applied": "Tema aplicado inmediatamente",
   "voice.title": "Configuración de voz",
   "voice.current": "Voz actual: {name}",

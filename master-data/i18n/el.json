@@ -41,6 +41,7 @@
   "settings.saving": "Αποταμίευση",
   "settings.saved": "Οι ρυθμίσεις αποθηκεύτηκαν",
   "settings.applied": "Οι ρυθμίσεις εφαρμόστηκαν αμέσως",
+  "toast.restartRequired": "Απαιτείται επανεκκίνηση του διακομιστή",
   "theme.applied": "Το θέμα εφαρμόστηκε αμέσως",
   "voice.title": "Ρύθμιση φωνής",
   "voice.current": "Τρέχουσα φωνή: {name}",

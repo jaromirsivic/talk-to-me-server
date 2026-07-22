@@ -4,6 +4,7 @@ import {translate} from "./i18n.js";
 
 let latestSetup = null;
 let loadingSetup = null;
+const TOAST_SECONDS = 9;
 
 export function getLatestSetup() {
   return latestSetup;
@@ -53,7 +54,7 @@ function createNetworkController() {
     mergeDraft: mergeNetwork,
     persist: persistSetup,
     onSaved: showSetupSaved,
-    onError: (error) => showToast(error.message, true),
+    onError: (error) => showToast(error.message, {kind: "error"}),
   });
   document.querySelector("#remote-management").addEventListener("change", updateRemoteWarning);
   return controller;
@@ -70,7 +71,7 @@ function createGeneralController() {
     mergeDraft: mergeGeneral,
     persist: persistSetup,
     onSaved: showSetupSaved,
-    onError: (error) => showToast(error.message, true),
+    onError: (error) => showToast(error.message, {kind: "error"}),
   });
 }
 
@@ -136,34 +137,69 @@ function mergeGeneral(next, draft) {
 }
 
 function showSetupSaved(body) {
-  const message = body.restartRequired
-    ? `Restart required: ${body.restartFields.join(", ")}`
-    : translate("settings.applied");
-  showToast(message);
+  showToast(body.restartRequired ? translate("settings.saved") : translate("settings.applied"), {
+    restartRequired: body.restartRequired,
+    restartFields: body.restartFields,
+  });
 }
 
-export function showToast(message, isError = false) {
-  const toast = document.querySelector("#portal-toast");
-  const supportsPopover = typeof toast.showPopover === "function";
-  if (supportsPopover && toast.matches(":popover-open")) toast.hidePopover();
+export function showToast(
+  message,
+  {kind = "success", restartRequired = false, restartFields = []} = {},
+) {
+  const host = document.querySelector("#toast-host");
+  const toast = document.querySelector("#toast-template").content.firstElementChild.cloneNode(true);
+  const effectiveKind = restartRequired ? "warning" : kind;
+  const restartMessage = restartRequired ? ` (${translate("toast.restartRequired")})` : "";
+  const fieldMessage = restartRequired && restartFields.length
+    ? `: ${restartFields.join(", ")}`
+    : "";
+  toast.querySelector("[data-toast-message]").textContent = `${message}${restartMessage}${fieldMessage}`;
+  toast.dataset.kind = effectiveKind;
+  toast.setAttribute("role", effectiveKind === "success" ? "status" : "alert");
+  toast.setAttribute("aria-live", effectiveKind === "success" ? "polite" : "assertive");
+  toast.querySelector("[data-toast-close]").setAttribute("aria-label", translate("dialog.close"));
+  host.append(toast);
+
+  let remaining = TOAST_SECONDS;
+  const countdown = toast.querySelector("[data-toast-countdown]");
+  countdown.textContent = `(${remaining})`;
+  const timer = setInterval(() => {
+    remaining -= 1;
+    if (remaining === 0) {
+      dismissToast(toast, timer);
+      return;
+    }
+    countdown.textContent = `(${remaining})`;
+  }, 1_000);
+  toast.querySelector("[data-toast-close]").onclick = () => dismissToast(toast, timer);
+  showToastHost(host);
+  return toast;
+}
+
+function showToastHost(host) {
   const modalDialogs = document.querySelectorAll("dialog:modal");
-  const toastHost = modalDialogs[modalDialogs.length - 1] || document.body;
-  toastHost.append(toast);
-  toast.querySelector("[data-toast-message]").textContent = message;
-  toast.dataset.kind = isError ? "error" : "success";
-  toast.setAttribute("role", isError ? "alert" : "status");
-  toast.setAttribute("aria-live", isError ? "assertive" : "polite");
-  toast.hidden = false;
-  toast.querySelector("[data-toast-close]").onclick = () => hideToast(toast);
-  if (supportsPopover) toast.showPopover();
+  const hostParent = modalDialogs[modalDialogs.length - 1] || document.body;
+  hostParent.append(host);
+  host.hidden = false;
+  if (typeof host.showPopover === "function") {
+    if (host.matches(":popover-open")) host.hidePopover();
+    host.showPopover();
+  } else {
+    host.dataset.fallbackOpen = "true";
+  }
 }
 
-function hideToast(toast) {
-  if (typeof toast.hidePopover === "function" && toast.matches(":popover-open")) {
-    toast.hidePopover();
-    return;
+function dismissToast(toast, timer) {
+  clearInterval(timer);
+  const host = toast.closest("#toast-host");
+  toast.remove();
+  if (host.children.length) return;
+  if (typeof host.hidePopover === "function" && host.matches(":popover-open")) {
+    host.hidePopover();
   }
-  toast.hidden = true;
+  delete host.dataset.fallbackOpen;
+  host.hidden = true;
 }
 
 function setValue(selector, valueToSet) {

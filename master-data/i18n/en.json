@@ -41,6 +41,7 @@
   "settings.saving": "Saving…",
   "settings.saved": "Settings saved",
   "settings.applied": "Settings applied immediately",
+  "toast.restartRequired": "Server restart required",
   "theme.applied": "Theme applied immediately",
   "voice.title": "Voice Setup",
   "voice.current": "Current voice: {name}",

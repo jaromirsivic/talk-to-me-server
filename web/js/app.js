@@ -4,9 +4,9 @@ import {initializeCodeControls} from "./code-controls.js";
 import {parseJson, prettyJson} from "./json.js";
 import {initializeBaseDialogs, openDialog} from "./modal.js";
 import {initializeI18n, translate} from "./i18n.js";
-import {initializeSettings} from "./settings.js";
-import {initializeTheme} from "./theme.js";
-import {initializeVoices} from "./voices.js";
+import {initializeSettings} from "./settings.js?v=sprint-0004";
+import {initializeTheme} from "./theme.js?v=sprint-0004";
+import {initializeVoices} from "./voices.js?v=sprint-0004";
 
 const editor = document.querySelector("#request-json");
 const editorView = document.querySelector(".composer-editor");
@@ -59,10 +59,9 @@ async function sendRequest() {
   }
   sendButton.disabled = true;
   status.textContent = translate("composer.sending");
-  if (!history.querySelector('[data-kind="request"]')) {
-    appendFirstMessageNotice(history);
-  }
+  const isFirstRequest = !history.querySelector('[data-kind="request"]');
   appendChatCard(history, "request", parsed.value, new Date());
+  if (isFirstRequest) appendFirstMessageNotice(history);
   try {
     const result = await postApi("textToSpeech", parsed.value);
     appendChatCard(history, "response", result.body, new Date());

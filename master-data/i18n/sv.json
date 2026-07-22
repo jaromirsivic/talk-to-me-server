@@ -41,6 +41,7 @@
   "settings.saving": "Sparar...",
   "settings.saved": "Inställningar sparade",
   "settings.applied": "Inställningar tillämpas omedelbart",
+  "toast.restartRequired": "Servern måste startas om",
   "theme.applied": "Temat gällde omedelbart",
   "voice.title": "Röstinställningar",
   "voice.current": "Aktuell röst: {name}",

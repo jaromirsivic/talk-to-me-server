@@ -41,7 +41,7 @@ def test_import_error_is_above_voice_dialog_and_can_be_closed(
     page.locator("#import-panel summary").click()
     page.get_by_role("button", name="Import local voice").click()
 
-    toast = page.locator("#portal-toast")
+    toast = page.locator('.toast[data-kind="error"]')
     expect(toast).to_be_visible()
     expect(toast).to_contain_text("Custom voice name and license are required")
     assert toast.evaluate(

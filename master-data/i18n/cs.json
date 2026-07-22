@@ -41,6 +41,7 @@
   "settings.saving": "Ukládání…",
   "settings.saved": "Nastavení uloženo",
   "settings.applied": "Nastavení byla použita okamžitě",
+  "toast.restartRequired": "Je vyžadován restart serveru",
   "theme.applied": "Téma bylo použito okamžitě",
   "voice.title": "Nastavení hlasu",
   "voice.current": "Aktuální hlas: {name}",

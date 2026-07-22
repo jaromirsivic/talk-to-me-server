@@ -1,7 +1,9 @@
 import {postApi, postMultipart} from "./api.js";
 import {openDialog} from "./modal.js";
 import {createSetupDialogController} from "./setup-dialog.js";
-import {getLatestSetup, loadSetup, persistSetup, showToast} from "./settings.js";
+import {
+  getLatestSetup, loadSetup, persistSetup, showToast,
+} from "./settings.js?v=sprint-0004";
 import {translate} from "./i18n.js";
 
 const STATUS_ICON_PATHS = {
@@ -28,7 +30,7 @@ export function initializeVoices() {
     mergeDraft: (setup, draft) => { setup.voice = draft; },
     persist: persistSetup,
     onSaved: () => showToast(translate("voice.saved")),
-    onError: (error) => showToast(error.message, true),
+    onError: (error) => showToast(error.message, {kind: "error"}),
     focusSelector: "#voice-search",
   });
 
@@ -73,7 +75,7 @@ function resetImport() {
 async function refreshVoices() {
   const {body, status} = await postApi("getVoices", {});
   if (status >= 400) {
-    showToast(body.reasonText || translate("voice.loadError"), true);
+    showToast(body.reasonText || translate("voice.loadError"), {kind: "error"});
     return;
   }
   voices = body.voices;
@@ -302,7 +304,7 @@ async function downloadVoice() {
     }
     showToast(translate("voice.downloaded"));
   } catch (error) {
-    showToast(error.message, true);
+    showToast(error.message, {kind: "error"});
   } finally {
     setDownloadProgress(false);
     button.disabled = false;
@@ -324,7 +326,7 @@ async function deleteVoice() {
     queueMicrotask(() => focusVoiceOption(candidate.id));
     showToast(translate("voice.deleted"));
   } catch (error) {
-    showToast(error.message, true);
+    showToast(error.message, {kind: "error"});
   } finally {
     button.disabled = false;
   }
@@ -346,7 +348,7 @@ async function importLocalVoice() {
   const model = document.querySelector("#custom-model-file").files[0];
   const config = document.querySelector("#custom-config-file").files[0];
   if (!model || !config || !model.name.endsWith(".onnx") || !config.name.endsWith(".onnx.json")) {
-    showToast(translate("voice.selectFilesError"), true);
+    showToast(translate("voice.selectFilesError"), {kind: "error"});
     return;
   }
   const initiatingSession = controller.captureSession();
@@ -366,17 +368,17 @@ async function finishImport(request, initiatingSession) {
     if (controller.isCurrentSession(initiatingSession)) stageVoice(body.voice.id);
     showToast(translate("voice.imported"));
   } catch (error) {
-    showToast(error.message, true);
+    showToast(error.message, {kind: "error"});
   }
 }
 
 function validateImportIdentity() {
   if (!importName() || !importLicense()) {
-    showToast(translate("voice.identityRequired"), true);
+    showToast(translate("voice.identityRequired"), {kind: "error"});
     return false;
   }
   if (!document.querySelector("#custom-rights").checked) {
-    showToast(translate("voice.rightsRequired"), true);
+    showToast(translate("voice.rightsRequired"), {kind: "error"});
     return false;
   }
   return true;

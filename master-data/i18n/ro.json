@@ -41,6 +41,7 @@
   "settings.saving": "Economisirea...",
   "settings.saved": "Setările au fost salvate",
   "settings.applied": "Setările aplicate imediat",
+  "toast.restartRequired": "Este necesară repornirea serverului",
   "theme.applied": "Tema aplicată imediat",
   "voice.title": "Configurare voce",
   "voice.current": "Vocea curentă: {name}",

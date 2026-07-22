@@ -41,6 +41,7 @@
   "settings.saving": "Coigilt",
   "settings.saved": "Socruithe sábháilte",
   "settings.applied": "Socruithe i bhfeidhm láithreach",
+  "toast.restartRequired": "Tá atosú an fhreastalaí riachtanach",
   "theme.applied": "Cuireadh an téama i bhfeidhm láithreach",
   "voice.title": "Socrú Gutha",
   "voice.current": "Guth reatha: {name}",
