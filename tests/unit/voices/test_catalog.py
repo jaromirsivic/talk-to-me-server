@@ -106,3 +106,83 @@ def test_catalog_marks_malformed_installed_voice_invalid(tmp_path) -> None:
 
     assert rows[0].id == "broken"
     assert rows[0].status is VoiceStatus.INVALID
+
+
+def test_catalog_resolves_manifest_paths_relative_to_voice_directory(tmp_path) -> None:
+    official = tmp_path / "official.json"
+    installed = tmp_path / "installed"
+    voice_root = installed / "en_US-ljspeech-medium"
+    write_json(
+        official,
+        {
+            "voices": [
+                {
+                    "id": "en_US-ljspeech-medium",
+                    "modelUrl": "https://example.test/model.onnx",
+                    "configUrl": "https://example.test/model.onnx.json",
+                    "modelSha256": "a" * 64,
+                    "configSha256": "b" * 64,
+                }
+            ]
+        },
+    )
+    (voice_root / "model.onnx").parent.mkdir(parents=True)
+    (voice_root / "model.onnx").write_bytes(b"model")
+    (voice_root / "model.onnx.json").write_text("{}", encoding="utf-8")
+    write_json(
+        voice_root / "voice.json",
+        {
+            "id": "en_US-ljspeech-medium",
+            "modelPath": "model.onnx",
+            "configPath": "model.onnx.json",
+        },
+    )
+    policy = VoiceLicensePolicy.from_file(Path("master-data/voice-license-policy.json"))
+
+    voice = VoiceCatalog(official, installed, tmp_path / "custom", policy).get(
+        "en_US-ljspeech-medium"
+    )
+
+    assert voice is not None
+    assert voice.model_path == voice_root / "model.onnx"
+    assert voice.config_path == voice_root / "model.onnx.json"
+
+
+def test_catalog_recovers_stale_absolute_manifest_paths_from_local_files(tmp_path) -> None:
+    official = tmp_path / "official.json"
+    installed = tmp_path / "installed"
+    voice_root = installed / "en_US-ljspeech-medium"
+    write_json(
+        official,
+        {
+            "voices": [
+                {
+                    "id": "en_US-ljspeech-medium",
+                    "modelUrl": "https://example.test/model.onnx",
+                    "configUrl": "https://example.test/model.onnx.json",
+                    "modelSha256": "a" * 64,
+                    "configSha256": "b" * 64,
+                }
+            ]
+        },
+    )
+    (voice_root / "model.onnx").parent.mkdir(parents=True)
+    (voice_root / "model.onnx").write_bytes(b"model")
+    (voice_root / "model.onnx.json").write_text("{}", encoding="utf-8")
+    write_json(
+        voice_root / "voice.json",
+        {
+            "id": "en_US-ljspeech-medium",
+            "modelPath": "Z:/removed-worktree/model.onnx",
+            "configPath": "Z:/removed-worktree/model.onnx.json",
+        },
+    )
+    policy = VoiceLicensePolicy.from_file(Path("master-data/voice-license-policy.json"))
+
+    voice = VoiceCatalog(official, installed, tmp_path / "custom", policy).get(
+        "en_US-ljspeech-medium"
+    )
+
+    assert voice is not None
+    assert voice.model_path == voice_root / "model.onnx"
+    assert voice.config_path == voice_root / "model.onnx.json"

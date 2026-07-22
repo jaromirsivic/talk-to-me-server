@@ -74,7 +74,12 @@ async def test_download_activates_pair_only_after_hash_and_validation(tmp_path) 
     assert voice.status.value == "ready"
     assert (destination / "model.onnx").read_bytes() == MODEL
     assert json.loads((destination / "model.onnx.json").read_text(encoding="utf-8"))
-    assert json.loads((destination / "voice.json").read_text(encoding="utf-8"))["licenseDecision"] == "approved"
+    manifest = json.loads((destination / "voice.json").read_text(encoding="utf-8"))
+    assert manifest["licenseDecision"] == "approved"
+    assert manifest["modelPath"] == "model.onnx"
+    assert manifest["configPath"] == "model.onnx.json"
+    assert voice.model_path == destination / "model.onnx"
+    assert voice.config_path == destination / "model.onnx.json"
     assert validated
     assert not list((tmp_path / "installed").glob(".staging-*"))
 

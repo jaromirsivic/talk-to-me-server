@@ -52,3 +52,10 @@
 - Hlavní webový modul používá verzovanou URL, aby prohlížeč po aktualizaci nenačetl starou logiku z cache.
 - Windows, Linux a macOS řídicí skripty ověřují, že naslouchající PID patří do procesního stromu daného projektu, a odmítnou falešně úspěšný start na portu vlastněném jiným procesem.
 - Byly doplněny jednotkové, integrační, smoke a E2E testy nového chování.
+
+## Přenositelné cesty hlasů a návrh záložní segmentace
+
+- Stahování oficiálních hlasů a import vlastních hlasů ukládají do `voice.json` relativní názvy modelu a konfigurace.
+- Katalog vyhodnocuje relativní cesty vůči adresáři manifestu a u staré neplatné absolutní cesty použije odpovídající lokální soubor vedle `voice.json`.
+- Regresní testy ověřují relativní cesty stažených i importovaných hlasů a obnovu starých manifestů.
+- Do `.administration/future_improvements.md` byla uložena diagnostika a doporučení k jednoduché záložní segmentaci textu.

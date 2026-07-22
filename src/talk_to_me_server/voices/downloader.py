@@ -148,8 +148,8 @@ class VoiceDownloader:
                         else "approved"
                     ),
                     "importedAt": datetime.now(UTC).isoformat(),
-                    "modelPath": str(destination / "model.onnx"),
-                    "configPath": str(destination / "model.onnx.json"),
+                    "modelPath": "model.onnx",
+                    "configPath": "model.onnx.json",
                 },
             )
             staging.rename(destination)

@@ -29,7 +29,12 @@ def test_local_import_copies_source_and_activates_custom_voice(tmp_path: Path) -
     assert voice.id == "custom/my-czech-voice"
     assert source_model.read_bytes() == MODEL
     assert (destination / "model.onnx").read_bytes() == MODEL
-    assert json.loads((destination / "voice.json").read_text(encoding="utf-8"))["license"] == "CC0-1.0"
+    manifest = json.loads((destination / "voice.json").read_text(encoding="utf-8"))
+    assert manifest["license"] == "CC0-1.0"
+    assert manifest["modelPath"] == "model.onnx"
+    assert manifest["configPath"] == "model.onnx.json"
+    assert voice.model_path == destination / "model.onnx"
+    assert voice.config_path == destination / "model.onnx.json"
     assert not list((tmp_path / "custom").glob(".staging-*"))
 
 

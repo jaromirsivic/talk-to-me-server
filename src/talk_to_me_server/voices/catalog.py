@@ -28,6 +28,9 @@ class VoiceCatalog:
         voices: dict[str, VoiceDescriptor] = {}
         for record in records:
             voice_id = str(record["id"])
+            installed_entry = installed.get(voice_id)
+            installed_manifest = installed_entry[0] if installed_entry else None
+            installed_directory = installed_entry[1] if installed_entry else None
             decision = self.policy.classify(record.get("license"))
             is_installed = voice_id in installed
             complete = self._is_complete(record)
@@ -57,18 +60,25 @@ class VoiceCatalog:
                 config_sha256=record.get("configSha256"),
                 model_md5=record.get("modelMd5"),
                 config_md5=record.get("configMd5"),
-                model_path=self._manifest_path(installed.get(voice_id), "modelPath"),
-                config_path=self._manifest_path(installed.get(voice_id), "configPath"),
+                model_path=self._manifest_path(
+                    installed_manifest, "modelPath", installed_directory
+                ),
+                config_path=self._manifest_path(
+                    installed_manifest, "configPath", installed_directory
+                ),
             )
-        for voice_id, manifest in custom.items():
-            voices[voice_id] = self._custom_descriptor(voice_id, manifest)
+        for voice_id, (manifest, manifest_directory) in custom.items():
+            voices[voice_id] = self._custom_descriptor(
+                voice_id, manifest, manifest_directory
+            )
         for voice_id in installed.keys() - voices.keys():
+            manifest, _manifest_directory = installed[voice_id]
             voices[voice_id] = VoiceDescriptor(
                 id=voice_id,
-                name=str(installed[voice_id].get("name") or voice_id),
-                language=str(installed[voice_id].get("language") or "und"),
-                quality=str(installed[voice_id].get("quality") or "unknown"),
-                license=installed[voice_id].get("license"),
+                name=str(manifest.get("name") or voice_id),
+                language=str(manifest.get("language") or "und"),
+                quality=str(manifest.get("quality") or "unknown"),
+                license=manifest.get("license"),
                 source="official",
                 status=VoiceStatus.INVALID,
                 blocked_reason="Installed voice is absent from the official catalog.",
@@ -100,10 +110,10 @@ class VoiceCatalog:
         )
 
     @staticmethod
-    def _manifests(root: Path) -> dict[str, dict[str, Any]]:
+    def _manifests(root: Path) -> dict[str, tuple[dict[str, Any], Path]]:
         if not root.exists():
             return {}
-        result: dict[str, dict[str, Any]] = {}
+        result: dict[str, tuple[dict[str, Any], Path]] = {}
         for path in root.glob("*/voice.json"):
             try:
                 manifest = json.loads(path.read_text(encoding="utf-8"))
@@ -111,11 +121,13 @@ class VoiceCatalog:
                 continue
             voice_id = manifest.get("id")
             if isinstance(voice_id, str) and voice_id:
-                result[voice_id] = manifest
+                result[voice_id] = (manifest, path.parent)
         return result
 
     @staticmethod
-    def _custom_descriptor(voice_id: str, manifest: dict[str, Any]) -> VoiceDescriptor:
+    def _custom_descriptor(
+        voice_id: str, manifest: dict[str, Any], manifest_directory: Path
+    ) -> VoiceDescriptor:
         return VoiceDescriptor(
             id=voice_id,
             name=str(manifest.get("name") or voice_id),
@@ -125,13 +137,34 @@ class VoiceCatalog:
             license=manifest.get("license"),
             source="custom",
             status=VoiceStatus.READY,
-            model_path=manifest.get("modelPath"),
-            config_path=manifest.get("configPath"),
+            model_path=VoiceCatalog._manifest_path(
+                manifest, "modelPath", manifest_directory
+            ),
+            config_path=VoiceCatalog._manifest_path(
+                manifest, "configPath", manifest_directory
+            ),
         )
 
     @staticmethod
-    def _manifest_path(manifest: dict[str, Any] | None, key: str) -> Path | None:
-        if manifest is None:
+    def _manifest_path(
+        manifest: dict[str, Any] | None,
+        key: str,
+        manifest_directory: Path | None,
+    ) -> Path | None:
+        if manifest is None or manifest_directory is None:
             return None
         value = manifest.get(key)
-        return Path(value) if isinstance(value, str) else None
+        if not isinstance(value, str) or not value:
+            return None
+        configured = Path(value)
+        if configured.is_absolute() and configured.is_file():
+            return configured
+        local = (manifest_directory / configured.name).resolve()
+        if configured.is_absolute():
+            return local
+        candidate = (manifest_directory / configured).resolve()
+        try:
+            candidate.relative_to(manifest_directory.resolve())
+        except ValueError:
+            return local
+        return candidate

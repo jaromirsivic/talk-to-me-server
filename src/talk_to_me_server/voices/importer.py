@@ -127,8 +127,8 @@ class VoiceImporter:
                 "sizeBytes": model_path.stat().st_size,
                 "modelSha256": _file_sha256(model_path),
                 "configSha256": _file_sha256(config_path),
-                "modelPath": str(destination / "model.onnx"),
-                "configPath": str(destination / "model.onnx.json"),
+                "modelPath": "model.onnx",
+                "configPath": "model.onnx.json",
             },
         )
         staging.rename(destination)
