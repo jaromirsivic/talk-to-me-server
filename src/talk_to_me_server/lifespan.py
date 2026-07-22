@@ -16,6 +16,7 @@ from talk_to_me_server.config.service import SettingsService
 from talk_to_me_server.domain.ids import JobIdGenerator
 from talk_to_me_server.domain.jobs import JobError
 from talk_to_me_server.domain.queue import QueueManager, QueueSettingsSnapshot
+from talk_to_me_server.hotkeys import GlobalStopHotkey
 from talk_to_me_server.logging_config import configure_logging
 from talk_to_me_server.playback.coordinator import PlaybackCoordinator
 from talk_to_me_server.playback.windows import WindowsAudioPlayer
@@ -31,6 +32,9 @@ from talk_to_me_server.voices.downloader import VoiceDownloader
 from talk_to_me_server.voices.importer import VoiceImporter
 from talk_to_me_server.voices.licenses import VoiceLicensePolicy
 from talk_to_me_server.voices.models import VoiceStatus
+
+
+LOGGER = logging.getLogger("talk_to_me_server")
 
 
 @dataclass
@@ -49,8 +53,12 @@ class Runtime:
     voice_deleter: Any | None = None
     voice_downloader: Any | None = None
     voice_importer: Any | None = None
+    global_hotkey: Any | None = None
     http_clients: list[httpx.AsyncClient] = field(default_factory=list)
     _tasks: list[asyncio.Task[Any]] = field(default_factory=list, init=False, repr=False)
+    _event_loop: asyncio.AbstractEventLoop | None = field(default=None, init=False, repr=False)
+    _hotkey_stop_task: asyncio.Task[Any] | None = field(default=None, init=False, repr=False)
+    _playback_stop_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
 
     def __post_init__(self) -> None:
         self.startup_settings = self.startup_settings.model_copy(deep=True)
@@ -75,6 +83,7 @@ class Runtime:
         return JobError(code=code, message=message, component=component)
 
     async def start(self) -> None:
+        self._event_loop = asyncio.get_running_loop()
         if self.process_pool is not None:
             await self.process_pool.start()
         if self.scheduler is not None:
@@ -83,11 +92,38 @@ class Runtime:
             self._tasks.append(asyncio.create_task(self.playback.run()))
         if self.garbage_collector is not None:
             self._tasks.append(asyncio.create_task(self.garbage_collector.run()))
-        logging.getLogger("talk_to_me_server").info(
+        if self.global_hotkey is not None:
+            try:
+                self.global_hotkey.start(self._request_stop_from_hotkey)
+                LOGGER.info(
+                    "Global stop hotkey registered",
+                    extra={"component": "hotkey", "event": "hotkey.started"},
+                )
+            except Exception:
+                LOGGER.warning(
+                    "Global stop hotkey is unavailable",
+                    exc_info=True,
+                    extra={"component": "hotkey", "event": "hotkey.unavailable"},
+                )
+        LOGGER.info(
             "Runtime started", extra={"component": "runtime", "event": "runtime.started"}
         )
 
     async def stop(self) -> None:
+        self._event_loop = None
+        if self.global_hotkey is not None:
+            try:
+                self.global_hotkey.stop()
+            except Exception:
+                LOGGER.warning(
+                    "Global stop hotkey shutdown failed",
+                    exc_info=True,
+                    extra={"component": "hotkey", "event": "hotkey.shutdown_failed"},
+                )
+        if self._hotkey_stop_task is not None and not self._hotkey_stop_task.done():
+            self._hotkey_stop_task.cancel()
+            await asyncio.gather(self._hotkey_stop_task, return_exceptions=True)
+        self._hotkey_stop_task = None
         for task in self._tasks:
             task.cancel()
         if self._tasks:
@@ -102,9 +138,63 @@ class Runtime:
                 await result
         for client in self.http_clients:
             await client.aclose()
-        logging.getLogger("talk_to_me_server").info(
+        LOGGER.info(
             "Runtime stopped", extra={"component": "runtime", "event": "runtime.stopped"}
         )
+
+    async def stop_playback(self) -> int:
+        if self.queue is None or self.archive is None or self.playback is None:
+            raise RuntimeError("Text-to-speech runtime is unavailable")
+        async with self._playback_stop_lock:
+            cancelled = await self.queue.begin_stop()
+            try:
+                await self.playback.stop()
+                for job in cancelled:
+                    self.archive.finalize(job)
+                for job in cancelled:
+                    if not (
+                        job.request.calculate_stats
+                        or job.request.wait_until_playback_finished
+                    ):
+                        await self.queue.release(job.id)
+                return len(cancelled)
+            finally:
+                await self.queue.finish_stop()
+
+    def _request_stop_from_hotkey(self) -> None:
+        loop = self._event_loop
+        if loop is None or loop.is_closed():
+            return
+        try:
+            loop.call_soon_threadsafe(self._start_hotkey_stop)
+        except RuntimeError:
+            LOGGER.warning(
+                "Global stop hotkey could not reach the runtime event loop",
+                exc_info=True,
+                extra={"component": "hotkey", "event": "hotkey.dispatch_failed"},
+            )
+
+    def _start_hotkey_stop(self) -> None:
+        if self._hotkey_stop_task is not None and not self._hotkey_stop_task.done():
+            return
+        self._hotkey_stop_task = asyncio.create_task(self._run_hotkey_stop())
+
+    async def _run_hotkey_stop(self) -> None:
+        try:
+            cancelled = await self.stop_playback()
+            LOGGER.info(
+                "Playback stopped by global hotkey",
+                extra={
+                    "component": "hotkey",
+                    "event": "hotkey.stop_completed",
+                    "cancelled_jobs": cancelled,
+                },
+            )
+        except Exception:
+            LOGGER.exception(
+                "Global stop hotkey action failed",
+                extra={"component": "hotkey", "event": "hotkey.stop_failed"},
+            )
 
 
 def build_runtime(project_root: Path) -> Runtime:
@@ -191,6 +281,7 @@ def build_runtime(project_root: Path) -> Runtime:
             catalog, official_root, http_client, validate_voice
         ),
         voice_importer=VoiceImporter(custom_root, validate_voice),
+        global_hotkey=GlobalStopHotkey(),
         http_clients=[http_client],
     )
 

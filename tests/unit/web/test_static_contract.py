@@ -14,8 +14,8 @@ def test_portal_has_semantic_shell_and_accessible_json_composer() -> None:
     assert 'data-i18n-aria-label="chat.region"' in html
     assert 'id="benchmark-request"' not in html
     assert 'id="reset-confirm-dialog"' in html
-    assert 'href="/styles.css?v=sprint-0004"' in html
-    assert 'src="/js/app.js?v=sprint-0004"' in html
+    assert 'href="/styles.css?v=sprint-0005"' in html
+    assert 'src="/js/app.js?v=sprint-0005"' in html
 
 
 def test_first_message_notice_is_inserted_after_the_first_request() -> None:
@@ -32,6 +32,19 @@ def test_first_message_notice_is_inserted_after_the_first_request() -> None:
     assert 'notice.setAttribute("role", "status")' in chat
     assert ".first-message-notice" in css
     assert "align-self: center" in css
+
+
+def test_response_cards_are_classified_by_reason_code_and_use_status_surfaces() -> None:
+    chat = Path("web/js/chat.js").read_text(encoding="utf-8")
+    css = Path("web/styles.css").read_text(encoding="utf-8")
+
+    assert 'card.dataset.responseStatus = value?.reasonCode === 200 ? "success" : "error"' in chat
+    assert '--response-success-surface:' in css
+    assert '--response-error-surface: #fdecec' in css
+    assert 'background: var(--response-error-surface)' in css
+    assert '.chat-card[data-kind="response"][data-response-status="success"]' in css
+    assert '.chat-card[data-kind="response"][data-response-status="error"]' in css
+    assert ':root[data-theme="dark"]' in css
 
 
 def test_default_request_is_valid_and_benchmark_is_fully_removed() -> None:
@@ -247,11 +260,11 @@ def test_changed_toast_modules_share_the_current_cache_version() -> None:
     theme = Path("web/js/theme.js").read_text(encoding="utf-8")
     voices = Path("web/js/voices.js").read_text(encoding="utf-8")
 
-    assert 'from "./settings.js?v=sprint-0004"' in app
-    assert 'from "./theme.js?v=sprint-0004"' in app
-    assert 'from "./voices.js?v=sprint-0004"' in app
-    assert 'from "./settings.js?v=sprint-0004"' in theme
-    assert 'from "./settings.js?v=sprint-0004"' in voices
+    assert 'from "./settings.js?v=sprint-0005"' in app
+    assert 'from "./theme.js?v=sprint-0005"' in app
+    assert 'from "./voices.js?v=sprint-0005"' in app
+    assert 'from "./settings.js?v=sprint-0005"' in theme
+    assert 'from "./settings.js?v=sprint-0005"' in voices
 
 
 def test_voice_download_dialog_has_an_accessible_progress_state() -> None:

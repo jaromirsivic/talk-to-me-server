@@ -3,7 +3,7 @@ import {openDialog} from "./modal.js";
 import {createSetupDialogController} from "./setup-dialog.js";
 import {
   getLatestSetup, loadSetup, persistSetup, showToast,
-} from "./settings.js?v=sprint-0004";
+} from "./settings.js?v=sprint-0005";
 import {translate} from "./i18n.js";
 
 const STATUS_ICON_PATHS = {

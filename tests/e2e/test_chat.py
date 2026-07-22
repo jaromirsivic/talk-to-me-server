@@ -51,6 +51,53 @@ def test_first_message_notice_follows_first_request_and_precedes_response(
     expect(notice).to_have_count(1)
 
 
+def test_response_background_reflects_reason_code_in_both_themes(
+    page: Page, live_server
+) -> None:
+    response_number = 0
+
+    def route_tts(route) -> None:
+        nonlocal response_number
+        response_number += 1
+        reason_code = 200 if response_number == 1 else 409
+        route.fulfill(
+            status=reason_code,
+            content_type="application/json",
+            body=json.dumps(
+                {
+                    "version": 1,
+                    "reasonCode": reason_code,
+                    "reasonText": "OK" if reason_code == 200 else "Conflict",
+                }
+            ),
+        )
+
+    page.route("**/api/v1/textToSpeech", route_tts)
+    page.goto(live_server.url)
+    page.get_by_role("button", name="Send request").click()
+    success = page.locator('[data-kind="response"]').first
+    expect(success).to_have_attribute("data-response-status", "success")
+    light_success = success.evaluate("node => getComputedStyle(node).backgroundColor")
+
+    page.get_by_role("button", name="Send request").click()
+    error = page.locator('[data-kind="response"]').last
+    expect(error).to_have_attribute("data-response-status", "error")
+    light_error = error.evaluate("node => getComputedStyle(node).backgroundColor")
+    notice_color = page.locator(".first-message-notice").evaluate(
+        "node => getComputedStyle(node).backgroundColor"
+    )
+    assert light_success != light_error
+    assert light_error == notice_color
+
+    page.locator("#theme-toggle").click()
+    expect(page.locator("html")).to_have_attribute("data-theme", "dark")
+    dark_success = success.evaluate("node => getComputedStyle(node).backgroundColor")
+    dark_error = error.evaluate("node => getComputedStyle(node).backgroundColor")
+    assert dark_success != dark_error
+    assert dark_success != light_success
+    assert dark_error != light_error
+
+
 def test_editor_starts_from_master_request_and_reports_json_location(
     page: Page, live_server
 ) -> None:

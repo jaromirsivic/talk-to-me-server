@@ -4,9 +4,9 @@ import {initializeCodeControls} from "./code-controls.js";
 import {parseJson, prettyJson} from "./json.js";
 import {initializeBaseDialogs, openDialog} from "./modal.js";
 import {initializeI18n, translate} from "./i18n.js";
-import {initializeSettings} from "./settings.js?v=sprint-0004";
-import {initializeTheme} from "./theme.js?v=sprint-0004";
-import {initializeVoices} from "./voices.js?v=sprint-0004";
+import {initializeSettings} from "./settings.js?v=sprint-0005";
+import {initializeTheme} from "./theme.js?v=sprint-0005";
+import {initializeVoices} from "./voices.js?v=sprint-0005";
 
 const editor = document.querySelector("#request-json");
 const editorView = document.querySelector(".composer-editor");

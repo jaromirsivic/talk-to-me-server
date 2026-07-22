@@ -1,4 +1,4 @@
-import {getLatestSetup, persistSetup, showToast} from "./settings.js?v=sprint-0004";
+import {getLatestSetup, persistSetup, showToast} from "./settings.js?v=sprint-0005";
 import {translate} from "./i18n.js";
 
 export function initializeTheme() {

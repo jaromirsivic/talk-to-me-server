@@ -53,6 +53,19 @@ Open <http://127.0.0.1:44448/>. All API operations use `POST`; see
 [`docs/api.md`](docs/api.md). Operational, backup, security, and recovery guidance is in
 [`docs/operations.md`](docs/operations.md).
 
+## Global playback stop shortcut
+
+While the server is running, `Ctrl+Shift+X` requests the same playback and queue stop as
+`POST /api/v1/stop`. The listener is best effort and never prevents the server from starting,
+serving requests, or shutting down. If registration or dispatch fails, the server records a
+`hotkey` event in its JSON log and continues without the shortcut.
+
+The shortcut requires an interactive desktop session. macOS may require Accessibility
+permission for the Python process or terminal that launches TalkToMe. Linux support depends
+on the display server and desktop security policy. X11 sessions are supported by the keyboard
+backend, while Wayland sessions may block global input listeners. A headless server continues
+normally without the shortcut. The Control key is used on macOS, not the Command key.
+
 ## Highlights
 
 - accepts up to 255 values of 16,384 Unicode code points each, including the full combination;
@@ -63,6 +76,7 @@ Open <http://127.0.0.1:44448/>. All API operations use `POST`; see
 - browses the official Piper catalog and imports a user-supplied local `.onnx`/`.onnx.json`
   pair after explicit rights confirmation;
 - displays request and response JSON indented with two spaces;
+- supports best-effort global `Ctrl+Shift+X` playback stop from the desktop session;
 - supports 30 locales, including Ukrainian and Norwegian, with RTL Arabic and LTR technical
   fields;
 - keeps Voice, Network, and General Setup edits as drafts until an explicit Save; Cancel,

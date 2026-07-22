@@ -45,19 +45,11 @@ async def stop_playback(request: Request) -> JSONResponse:
     runtime = request.app.state.runtime
     if runtime.queue is None or runtime.archive is None or runtime.playback is None:
         return envelope(503, "Text-to-speech runtime is unavailable")
-    cancelled = await runtime.queue.begin_stop()
     try:
-        await runtime.playback.stop()
-        for job in cancelled:
-            runtime.archive.finalize(job)
-        for job in cancelled:
-            if not (job.request.calculate_stats or job.request.wait_until_playback_finished):
-                await runtime.queue.release(job.id)
-        return envelope(200, "Playback stopped", cancelledJobs=len(cancelled))
+        cancelled_jobs = await runtime.stop_playback()
+        return envelope(200, "Playback stopped", cancelledJobs=cancelled_jobs)
     except OSError:
         return envelope(507, "Archive is not writable")
-    finally:
-        await runtime.queue.finish_stop()
 
 
 @router.post("/textToSpeech")

@@ -18,6 +18,9 @@ export function appendChatCard(history, kind, value, timestamp = new Date()) {
   const fragment = document.querySelector("#chat-card-template").content.cloneNode(true);
   const card = fragment.querySelector(".chat-card");
   card.dataset.kind = kind;
+  if (kind === "response") {
+    card.dataset.responseStatus = value?.reasonCode === 200 ? "success" : "error";
+  }
   card.querySelector(".card-kind").textContent = translate(`chat.${kind}`);
   const time = card.querySelector(".card-time");
   const instant = new Date(timestamp);

@@ -76,3 +76,11 @@
 - Akce vyžadující restart zobrazují lokalizované varování včetně dotčených konfiguračních polí ve všech podporovaných jazycích.
 - Verzování webových assetů bylo zvýšeno na `sprint-0004`, aby prohlížeč nekombinoval nové HTML se starými toastovými moduly z cache.
 - Statické a E2E testy ověřují pořadí chatu, skládání toastů, odpočet, barvy, zavírání, restartové varování a společnou verzi modulů.
+
+## Stavové barvy odpovědí a globální zkratka Stop
+
+- Response karty používají decentní zelené pozadí pro `reasonCode: 200` a červené pozadí sdílené s upozorněním po prvním requestu pro ostatní hodnoty.
+- Světlý i tmavý motiv mají samostatné kontrastní stavové odstíny bez změny barvy textu odpovědi.
+- Best-effort globální zkratka `Ctrl+Shift+X` na Windows, macOS a Linuxu thread-safe volá stejnou serializovanou operaci Stop jako REST endpoint.
+- Chyba při inicializaci, callbacku nebo ukončení globálního listeneru se zaznamená do logu a neovlivní spuštění, běh ani ukončení serveru.
+- Doplněna závislost `pynput`, provozní dokumentace, cache verze `sprint-0005` a automatické testy stavových stylů a životního cyklu zkratky.
