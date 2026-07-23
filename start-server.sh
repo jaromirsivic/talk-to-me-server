@@ -2,6 +2,15 @@
 
 set -eu
 
+case "${1:-}" in
+    "") skip_wait=false ;;
+    skip-wait) skip_wait=true ;;
+    *)
+        printf 'Unknown argument: %s\n' "$1" >&2
+        exit 2
+        ;;
+esac
+
 project_root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 runtime_root="$project_root/.runtime"
 python_bin="$project_root/.venv/bin/python"
@@ -160,6 +169,10 @@ cd "$project_root"
 nohup "$python_bin" -m talk_to_me_server >"$stdout_path" 2>"$stderr_path" </dev/null &
 server_pid=$!
 printf '%s\n' "$server_pid" > "$pid_file"
+if [ "$skip_wait" = true ]; then
+    printf 'TalkToMe server launch requested. PID: %s\n' "$server_pid"
+    exit 0
+fi
 
 attempt=0
 while [ "$attempt" -lt 150 ]; do

@@ -2,7 +2,8 @@
 param(
     [Parameter(Mandatory = $true)]
     [ValidateSet("Start", "Stop")]
-    [string]$Action
+    [string]$Action,
+    [switch]$SkipWait
 )
 
 Set-StrictMode -Version Latest
@@ -157,6 +158,10 @@ function Start-TalkToMeServer {
     $stderrPath = Join-Path $runtimeRoot "server.err.log"
     $arguments = "-NoLogo -NoProfile -ExecutionPolicy Bypass -File `"$runScript`""
     $launcher = Start-Process -FilePath "powershell.exe" -ArgumentList $arguments -WorkingDirectory $projectRoot -WindowStyle Hidden -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -PassThru
+    if ($SkipWait) {
+        Write-Host ("TalkToMe server launch requested. PID: " + $launcher.Id)
+        return
+    }
     $deadline = [DateTime]::UtcNow.AddSeconds(15)
     $trackedPid = 0
     do {
